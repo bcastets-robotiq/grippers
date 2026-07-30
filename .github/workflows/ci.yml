@@ -46,6 +46,43 @@ jobs:
           cmake --build build -j 4
           ctest --test-dir build --output-on-failure
 
+  # The freestanding configuration has no runner that can run it, so this is a
+  # compile-only guard. It exists because the bare-metal breakages are the quiet
+  # kind: the standard library's threading probe answering wrongly downgrades
+  # detail::Mutex to a no-op lock rather than failing the build.
+  embedded:
+    runs-on: ubuntu-latest
+    env:
+      CXXFLAGS: -std=c++17 -Isdk_cpp/include -Isdk_cpp/third_party/nanomodbus
+                -mcpu=cortex-m55 -mthumb -fexceptions -Wall -Wextra -Werror
+                -DGRIPPERS_BUILD_DEFAULT_SERIAL=0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the arm-none-eabi toolchain
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi
+
+      # The single-threaded layer: what a superloop target actually builds.
+      - name: Compile for cortex-m55
+        run: |
+          arm-none-eabi-g++ $CXXFLAGS -c -o /dev/null sdk_cpp/src/logger.cpp
+          arm-none-eabi-g++ $CXXFLAGS -c -o /dev/null sdk_cpp/src/detail/gripper_modbus_client.cpp
+
+      - name: Assert the target is detected as thread-less
+        run: |
+          printf '#include <Robotiq/detail/std_threading.hpp>\n' > probe.cpp
+          printf 'static_assert(GRIPPERS_HAS_STD_THREADS == 0, "cortex-m55 has no gthreads");\n' >> probe.cpp
+          arm-none-eabi-g++ $CXXFLAGS -fsyntax-only probe.cpp
+
+      # Gripper needs a thread: without an RTOS adapter that must be a loud
+      # #error, never a silent build against a no-op lock.
+      - name: Assert the threaded Gripper refuses to build without an RTOS
+        run: |
+          if arm-none-eabi-g++ $CXXFLAGS -fsyntax-only sdk_cpp/src/gripper.cpp 2> err.log; then
+            echo "::error::gripper.cpp compiled for a thread-less target; it must #error instead"
+            exit 1
+          fi
+          grep -q "GRIPPERS_RTOS_THREADX" err.log || { echo "::error::failed, but not with the documented diagnostic"; cat err.log; exit 1; }
+
   format:
     runs-on: ubuntu-latest
     steps:
