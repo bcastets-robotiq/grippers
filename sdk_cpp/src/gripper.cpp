@@ -6,8 +6,9 @@
 
 #include <algorithm>
 #include <atomic>
-#include <mutex>
-#include <thread>
+#include <cmath>
+#include <Robotiq/detail/mutex.hpp>
+#include <Robotiq/detail/thread.hpp>
 #include <utility>
 
 #include <Robotiq/gripper/connection_config.hpp>
@@ -17,14 +18,21 @@
 #include <Robotiq/gripper/status.hpp>
 #include <Robotiq/gripper/logger.hpp>
 #include <Robotiq/gripper/throttle.hpp>
+#ifndef GRIPPERS_BUILD_DEFAULT_SERIAL
+#define GRIPPERS_BUILD_DEFAULT_SERIAL 1
+#endif
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 #include <Robotiq/detail/default_serial.hpp>
+#endif
 #include <Robotiq/detail/gripper_modbus_client.hpp>
 #include <Robotiq/detail/serial.hpp>
 
 #include "exchange_period.hpp"
 
 namespace Robotiq {
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 using detail::DefaultSerial;
+#endif
 using detail::Serial;
 namespace {
 //! Consecutive exchange failures before state() degrades to Faulted.
@@ -40,14 +48,16 @@ struct Gripper::Impl
    Throttle failureLogThrottle{std::chrono::milliseconds(1000)};
    std::chrono::microseconds period;
 
-   mutable std::mutex imageMutex;
+   mutable detail::Mutex imageMutex;
    GripperCommand command{};
    GripperStatus status{};
 
    std::atomic<ConnectionState> state{ConnectionState::Connecting};
    std::atomic<bool> running{false};
-   std::atomic<uint64_t> consecutiveFailures{0};
-   std::thread exchangeThread;
+   // 32-bit: a 64-bit atomic needs __atomic_*_8 (no native 8-byte atomic on a
+   // 32-bit MCU); a failure counter never needs more than 32 bits.
+   std::atomic<uint32_t> consecutiveFailures{0};
+   Robotiq::detail::Thread exchangeThread;
 
    Impl(std::unique_ptr<Serial> serial,
         uint8_t slaveAddress,
@@ -89,7 +99,7 @@ struct Gripper::Impl
          }
       }
 
-      const std::lock_guard<std::mutex> lock(imageMutex);
+      const std::lock_guard<detail::Mutex> lock(imageMutex);
       status = fresh;
       command = GripperCommand::defaults();
       command.action.set(ActionRequestBit::Activate, fresh.gripperStatus.activated());
@@ -102,7 +112,7 @@ struct Gripper::Impl
    {
       GripperCommand commandCopy;
       {
-         const std::lock_guard<std::mutex> lock(imageMutex);
+         const std::lock_guard<detail::Mutex> lock(imageMutex);
          commandCopy = command;
       }
 
@@ -124,7 +134,7 @@ struct Gripper::Impl
       }
 
       {
-         const std::lock_guard<std::mutex> lock(imageMutex);
+         const std::lock_guard<detail::Mutex> lock(imageMutex);
          status = freshStatus;
       }
       consecutiveFailures.store(0);
@@ -137,7 +147,7 @@ struct Gripper::Impl
    void start()
    {
       running.store(true);
-      exchangeThread = std::thread([this] {
+      exchangeThread = Robotiq::detail::Thread([this] {
          auto nextCycle = std::chrono::steady_clock::now();
          while(running.load())
          {
@@ -158,7 +168,7 @@ struct Gripper::Impl
             // Overrun cycles (e.g. timeouts during a fault) must not
             // accumulate a backlog that bursts exchanges on recovery.
             nextCycle = std::max(nextCycle + period, std::chrono::steady_clock::now());
-            std::this_thread::sleep_until(nextCycle);
+            detail::sleepUntil(nextCycle);
          }
       });
    }
@@ -174,13 +184,16 @@ struct Gripper::Impl
 };
 
 namespace {
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 std::unique_ptr<Serial> makeSerial(const ConnectionConfig& config, const std::shared_ptr<Logger>& logger)
 {
    return std::make_unique<DefaultSerial>(config.serial, logger);
 }
+#endif
 
 } // namespace
 
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 Gripper::Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger)
    : Gripper(makeSerial(config, logger),
              config.modbusSlaveAddress,
@@ -188,6 +201,7 @@ Gripper::Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger)
              logger)
 {
 }
+#endif
 
 Gripper::Gripper(std::unique_ptr<detail::Serial> serial,
                  uint8_t slaveAddress,
@@ -203,19 +217,19 @@ Gripper::~Gripper() = default;
 
 void Gripper::setCommand(const GripperCommand& command)
 {
-   const std::lock_guard<std::mutex> lock(_impl->imageMutex);
+   const std::lock_guard<detail::Mutex> lock(_impl->imageMutex);
    _impl->command = command;
 }
 
 GripperCommand Gripper::getCommand() const
 {
-   const std::lock_guard<std::mutex> lock(_impl->imageMutex);
+   const std::lock_guard<detail::Mutex> lock(_impl->imageMutex);
    return _impl->command;
 }
 
 GripperStatus Gripper::getStatus() const
 {
-   const std::lock_guard<std::mutex> lock(_impl->imageMutex);
+   const std::lock_guard<detail::Mutex> lock(_impl->imageMutex);
    return _impl->status;
 }
 

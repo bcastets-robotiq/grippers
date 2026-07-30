@@ -149,6 +149,27 @@ target_link_libraries(your_target PRIVATE Robotiq::grippers)
   than configured. High-rate control on Windows is currently untuned —
   open an issue if your application needs it.
 
+## Embedded / bare-metal builds
+
+The SDK runs on freestanding targets (e.g. STM32 microcontrollers, arm-none-eabi)
+without a hosted C++ runtime:
+
+- **`GRIPPERS_BUILD_DEFAULT_SERIAL=OFF`** (CMake option, default ON) drops the
+  libserialport-backed `DefaultSerial` and its dependency. Inject your own
+  `detail::Serial` (e.g. a UART transport) via the `unique_ptr<Serial>`
+  constructors of `detail::GripperModbusClient` / `Gripper`.
+- **`detail::GripperModbusClient`** is the no-thread layer: one Modbus transaction
+  per call, so a single-threaded superloop schedules the exchange itself. This is
+  the simplest path for small MCUs and needs no RTOS.
+- **`Gripper`** (the threaded runtime API) needs a thread + a lock. On a hosted
+  runtime these are `std::thread`/`std::mutex`; on bare metal define
+  **`GRIPPERS_RTOS_THREADX`** to back them with Azure RTOS ThreadX (put ThreadX on
+  the include path). Tune the exchange task with `GRIPPERS_THREADX_STACK_SIZE` /
+  `GRIPPERS_THREADX_PRIORITY`. `steady_clock` must be backed on the target (e.g. a
+  SysTick-driven `clock_gettime`). Other RTOSes: add a `BasicLockable` adapter
+  (see `detail/rtos/threadx_mutex.hpp`) and a `detail::Thread` branch — the
+  ThreadX support is the reference.
+
 ## License
 
 BSD-3-Clause. Portions derived from PickNik Robotics'

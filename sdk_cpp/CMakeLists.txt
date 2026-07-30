@@ -27,11 +27,19 @@ option(GRIPPERS_BUILD_TESTS "Build the unit tests" ${GRIPPERS_TOP_LEVEL})
 # to leave it out.
 option(GRIPPERS_BUILD_FAKE "Build the fake gripper device" ON)
 
+# The libserialport-backed DefaultSerial is a desktop convenience. Turn it OFF
+# for bare-metal / freestanding targets (e.g. arm-none-eabi microcontrollers)
+# that inject their own Serial implementation; this drops the libserialport
+# dependency and the ConnectionConfig-based constructors that build a DefaultSerial.
+option(GRIPPERS_BUILD_DEFAULT_SERIAL "Build the libserialport-backed DefaultSerial" ON)
+
 # --- libserialport ------------------------------------------------------
 # Resolved through cmake/Findserialport.cmake — the same module the
 # installed grippers-config.cmake uses, so the lookup logic lives once.
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-find_package(serialport MODULE REQUIRED)
+if(GRIPPERS_BUILD_DEFAULT_SERIAL)
+  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+  find_package(serialport MODULE REQUIRED)
+endif()
 
 # --- SDK library --------------------------------------------------------
 add_library(grippers_sdk)
@@ -47,7 +55,14 @@ target_include_directories(grippers_sdk
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/nanomodbus
 )
 
-target_link_libraries(grippers_sdk PRIVATE serialport::serialport)
+# Propagate the choice to the sources (default_serial include + the
+# ConnectionConfig constructors are guarded on this macro).
+target_compile_definitions(grippers_sdk PUBLIC
+  GRIPPERS_BUILD_DEFAULT_SERIAL=$<BOOL:${GRIPPERS_BUILD_DEFAULT_SERIAL}>)
+
+if(GRIPPERS_BUILD_DEFAULT_SERIAL)
+  target_link_libraries(grippers_sdk PRIVATE serialport::serialport)
+endif()
 
 find_package(Threads REQUIRED)
 target_link_libraries(grippers_sdk PUBLIC Threads::Threads)

@@ -4,11 +4,23 @@
 
 #include <Robotiq/gripper/logger.hpp>
 
+// StderrLogger is a desktop convenience: it needs <iostream> (which pulls in
+// wide-char printf and ~25 KB) and a wall clock (system_clock -> _gettimeofday),
+// neither of which exists usefully on a freestanding target. On embedded builds
+// (GRIPPERS_BUILD_DEFAULT_SERIAL=0) it degrades to a no-op and makeDefaultLogger
+// returns a NullLogger; provide your own Logger (e.g. a UART sink) for real logs.
+#ifndef GRIPPERS_BUILD_DEFAULT_SERIAL
+#define GRIPPERS_BUILD_DEFAULT_SERIAL 1
+#endif
+
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#endif
 
 namespace Robotiq {
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 namespace {
 const char* toString(Logger::Level level)
 {
@@ -48,18 +60,27 @@ void writeTimestamp(std::ostream& out)
 
 void StderrLogger::log(Level level, std::string_view message)
 {
-   std::lock_guard<std::mutex> lock(_mutex);
+   std::lock_guard<detail::Mutex> lock(_mutex);
    writeTimestamp(std::cerr);
    std::cerr << '[' << toString(level) << "] " << message << '\n';
 }
+#else  // freestanding: no iostream/wall-clock. StderrLogger is a no-op sink.
+void StderrLogger::log(Level, std::string_view) {}
+#endif // GRIPPERS_BUILD_DEFAULT_SERIAL
 
 void NullLogger::log(Level, std::string_view) {}
 
 std::shared_ptr<Logger> makeDefaultLogger()
 {
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
    // One shared instance: fallback users share a single mutex, so their
    // stderr lines stay serialized against each other.
    static const auto instance = std::make_shared<StderrLogger>();
+#else
+   // No console on a freestanding target; default to discarding. Pass an
+   // application Logger (e.g. a UART sink) to get real logs.
+   static const std::shared_ptr<Logger> instance = std::make_shared<NullLogger>();
+#endif
    return instance;
 }
 } // namespace Robotiq

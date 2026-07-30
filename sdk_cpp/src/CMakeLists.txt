@@ -4,7 +4,6 @@ target_sources(grippers_sdk PRIVATE
   exchange_period.hpp
   logger.cpp
   detail/gripper_modbus_client.cpp
-  detail/default_serial.cpp
 )
 
 if(GRIPPERS_BUILD_FAKE)
@@ -19,4 +18,9 @@ if(GRIPPERS_BUILD_FAKE)
     fake/status_writer.hpp
     fake/status_writer.cpp
   )
+endif()
+
+# libserialport-backed transport: desktop only (see GRIPPERS_BUILD_DEFAULT_SERIAL).
+if(GRIPPERS_BUILD_DEFAULT_SERIAL)
+  target_sources(grippers_sdk PRIVATE detail/default_serial.cpp)
 endif()

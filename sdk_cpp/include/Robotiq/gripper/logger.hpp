@@ -14,11 +14,14 @@
 
 #include <chrono>
 #include <memory>
-#include <mutex>
+#include <mutex> // std::lock_guard
 #include <string_view>
 #include <utility>
 
+#include <Robotiq/detail/mutex.hpp> // detail::Mutex (std::mutex / RTOS / no-op)
+
 namespace Robotiq {
+
 class Logger
 {
 public:
@@ -45,7 +48,7 @@ public:
    void log(Level level, std::string_view message) override;
 
 private:
-   std::mutex _mutex;
+   detail::Mutex _mutex; // real std::mutex when threaded; no-op otherwise
 };
 
 //! \brief A do-nothing Logger, useful in tight benchmarks or tests.

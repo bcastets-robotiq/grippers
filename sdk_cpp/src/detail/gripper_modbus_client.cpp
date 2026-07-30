@@ -19,7 +19,14 @@
 #include <Robotiq/gripper/status.hpp>
 #include <Robotiq/gripper/serial_io_exception.hpp>
 #include <Robotiq/detail/byte_packing.hpp>
+// The libserialport-backed DefaultSerial is a desktop-only convenience. Bare-metal
+// builds set GRIPPERS_BUILD_DEFAULT_SERIAL=0 and inject their own Serial instead.
+#ifndef GRIPPERS_BUILD_DEFAULT_SERIAL
+#define GRIPPERS_BUILD_DEFAULT_SERIAL 1
+#endif
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 #include <Robotiq/detail/default_serial.hpp>
+#endif
 #include <Robotiq/detail/gripper_modbus_client.hpp>
 #include <Robotiq/detail/modbus_constants.hpp>
 #include <Robotiq/detail/serial.hpp>
@@ -106,10 +113,12 @@ void check(nmbs_error err, const std::string& context)
    }
 }
 
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 std::unique_ptr<Serial> makeSerial(const ConnectionConfig& config, const std::shared_ptr<Logger>& logger)
 {
    return std::make_unique<DefaultSerial>(config.serial, logger);
 }
+#endif
 } // namespace
 
 struct GripperModbusClient::Impl
@@ -120,10 +129,12 @@ struct GripperModbusClient::Impl
    nmbs_t nmbs{};
 };
 
+#if GRIPPERS_BUILD_DEFAULT_SERIAL
 GripperModbusClient::GripperModbusClient(const ConnectionConfig& config, std::shared_ptr<Logger> logger)
    : GripperModbusClient(makeSerial(config, logger), config.modbusSlaveAddress, logger)
 {
 }
+#endif
 
 GripperModbusClient::GripperModbusClient(std::unique_ptr<Serial> serial,
                                          uint8_t slaveAddress,
