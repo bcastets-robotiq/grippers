@@ -2,11 +2,18 @@
 //
 // Licensed under the BSD-3-Clause license; see LICENSE for details.
 
-//! \brief Byte layout of the Robotiq 2F adaptive grippers'
-//!        (2F-85 / 2F-140 / Hand-E class) command and status blocks, as
-//!        published in the gripper's instruction manual. The blocks are
-//!        byte-addressed:
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+
+//! \ingroup commanding
+//! \brief Byte and bit layout of the Robotiq 2F adaptive grippers'
+//! (2F-85 / 2F-140 / Hand-E class) command and status blocks, as
+//! published in the gripper's instruction manual.
 //!
+//! The blocks are byte-addressed:
+//! \code
 //!   Byte     Robot output (command)     Robot input (status)
 //!   0        ACTION REQUEST             GRIPPER STATUS
 //!   1        RESERVED                   RESERVED
@@ -15,53 +22,88 @@
 //!   4        SPEED                      POSITION
 //!   5        FORCE                      CURRENT
 //!   6-15     RESERVED                   RESERVED
-
-#pragma once
-
-#include <cstddef>
-#include <cstdint>
-
+//! \endcode
+//!
+//! Two of those bytes are themselves packed with several fields — the
+//! GRIPPER STATUS byte and the FAULT STATUS byte — so this namespace
+//! also carries the bit masks and shifts needed to pull a field's raw
+//! value out of its packed byte: `(byte & xMask) >> xShift`.
+//!
+//! Most consumers never need any of this directly: GripperCommand and
+//! GripperStatus already expose the byte-level fields as named members,
+//! and GripperStatusFlags / FaultStatus already expose the packed
+//! bytes' sub-fields as accessors — activationState(), objectDetection(),
+//! gripperFault(), controllerFault() — pre-masked and pre-shifted. Reach
+//! for these constants only below that layer, e.g. decoding a raw byte
+//! in a no-thread integration.
 namespace Robotiq::register_map {
 
-inline constexpr std::size_t kCommandBlockBytes = 16;
-inline constexpr std::size_t kStatusBlockBytes = 16;
+//! \name Block layout
+//! How wide each block is, and how many of its leading bytes the manual
+//! tables — the rest is reserved (see the byte table above).
+//! \{
+inline constexpr std::size_t kCommandBlockBytes = 16; //!< total width of the command block, in bytes
+inline constexpr std::size_t kStatusBlockBytes = 16; //!< total width of the status block, in bytes
+inline constexpr std::size_t kCommandDocumentedBytes = 6; //!< leading command-block bytes with a tabled field
+inline constexpr std::size_t kStatusDocumentedBytes = 6; //!< leading status-block bytes with a tabled field
+//! \}
 
-// The leading bytes of each block carry the fields tabled in the manual;
-// the rest is reserved. Bandwidth-precious transports, such as Modbus RTU
-// move only the documented bytes; transports with headroom may carry the
-// whole block, leaving room for future fields without repacking. The two
-// counts are independent: the manual may table a new byte in one block
-// without tabling one in the other.
-inline constexpr std::size_t kCommandDocumentedBytes = 6;
-inline constexpr std::size_t kStatusDocumentedBytes = 6;
+//! \name GRIPPER STATUS byte — masks and shifts
+//! Extract a field from byte 0 of the status block as
+//! `(byte & xMask) >> xShift` (the single-bit flags gACT/gGTO have no
+//! shift: the mask alone reads as 0 or 1).
+//!
+//! GripperStatusFlags already does this for you — reach for these
+//! constants directly only when you have a raw status byte and no
+//! GripperStatusFlags wrapping it, e.g. a no-thread integration decoding
+//! bytes straight off the wire:
+//! \code{.cpp}
+//! uint8_t rawStatusByte = /* read from the wire */;
+//! uint8_t gSTA = (rawStatusByte & Robotiq::register_map::kActivationStateMask)
+//!                >> Robotiq::register_map::kActivationStateShift;
+//! bool activated = (rawStatusByte & Robotiq::register_map::kActivationStatusMask) != 0;
+//! \endcode
+//! \{
+inline constexpr uint8_t kActivationStatusMask = 0x01; //!< gACT
+inline constexpr uint8_t kGoToEchoMask = 0x08; //!< gGTO
+inline constexpr uint8_t kActivationStateMask = 0x30; //!< gSTA (bits 4-5)
+inline constexpr uint8_t kObjectDetectionMask = 0xC0; //!< gOBJ (bits 6-7)
+inline constexpr int kActivationStateShift = 4; //!< shift applied to gSTA after masking
+inline constexpr int kObjectDetectionShift = 6; //!< shift applied to gOBJ after masking
+//! \}
 
-// Bit layout of the gripper-status byte (byte 0 of the status block):
-//   bit    7     6     5     4     3     2     1     0
-//         gOBJ  gOBJ  gSTA  gSTA  gGTO  rsvd  rsvd  gACT
-inline constexpr uint8_t kActivationStatusMask = 0x01; // gACT
-inline constexpr uint8_t kGoToEchoMask = 0x08; // gGTO
-inline constexpr uint8_t kActivationStateMask = 0x30; // gSTA (bits 4-5)
-inline constexpr uint8_t kObjectDetectionMask = 0xC0; // gOBJ (bits 6-7)
-inline constexpr int kActivationStateShift = 4;
-inline constexpr int kObjectDetectionShift = 6;
+//! \name gSTA field values
+//! What a masked-and-shifted gSTA decodes to. These mirror ActivationState
+//! — GripperStatusFlags::activationState() returns that enum, built from
+//! these same values — and exist here only for code decoding a raw byte
+//! directly.
+//! \{
+inline constexpr uint8_t kActivationStateReset = 0x00; //!< see ActivationState::Reset
+inline constexpr uint8_t kActivationStateInProgress = 0x01; //!< see ActivationState::InProgress
+inline constexpr uint8_t kActivationStateReserved = 0x02; //!< see ActivationState::Reserved
+inline constexpr uint8_t kActivationStateComplete = 0x03; //!< see ActivationState::Complete
+//! \}
 
-// gSTA values (after shift).
-inline constexpr uint8_t kActivationStateReset = 0x00;
-inline constexpr uint8_t kActivationStateInProgress = 0x01;
-inline constexpr uint8_t kActivationStateReserved = 0x02; // not allocated by the manual
-inline constexpr uint8_t kActivationStateComplete = 0x03;
+//! \name gOBJ field values
+//! What a masked-and-shifted gOBJ decodes to. These mirror ObjectDetection
+//! — GripperStatusFlags::objectDetection() returns that enum, built from
+//! these same values — and exist here only for code decoding a raw byte
+//! directly.
+//! \{
+inline constexpr uint8_t kObjectMoving = 0x00; //!< see ObjectDetection::Moving
+inline constexpr uint8_t kObjectDetectedOpening = 0x01; //!< see ObjectDetection::DetectedWhileOpening
+inline constexpr uint8_t kObjectDetectedClosing = 0x02; //!< see ObjectDetection::DetectedWhileClosing
+inline constexpr uint8_t kObjectAtRequestedPosition = 0x03; //!< see ObjectDetection::AtRequestedPosition
+//! \}
 
-// gOBJ values (after shift).
-inline constexpr uint8_t kObjectMoving = 0x00; // fingers in motion (if rGTO)
-inline constexpr uint8_t kObjectDetectedOpening = 0x01; // stopped while opening
-inline constexpr uint8_t kObjectDetectedClosing = 0x02; // stopped while closing
-inline constexpr uint8_t kObjectAtRequestedPosition = 0x03;
-
-// The FAULT STATUS byte (byte 2) splits into two nibbles: the gripper's
-// own fault (gFLT) in the low nibble, the optional controller fault
-// (kFLT) in the high nibble.
-inline constexpr uint8_t kGripperFaultMask = 0x0F; // gFLT
-inline constexpr uint8_t kControllerFaultMask = 0xF0; // kFLT
-inline constexpr int kControllerFaultShift = 4;
+//! \name FAULT STATUS byte — masks and shift
+//! Extract a field from byte 2 of the status block as `(byte & xMask) >> xShift`
+//! (same pattern as the GRIPPER STATUS byte masks above; FaultStatus does
+//! this for you unless you're decoding a raw byte directly).
+//! \{
+inline constexpr uint8_t kGripperFaultMask = 0x0F; //!< gFLT (low nibble)
+inline constexpr uint8_t kControllerFaultMask = 0xF0; //!< kFLT (high nibble)
+inline constexpr int kControllerFaultShift = 4; //!< shift applied to kFLT after masking
+//! \}
 
 } // namespace Robotiq::register_map

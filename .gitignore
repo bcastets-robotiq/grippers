@@ -3,3 +3,6 @@ build/
 .qtcreator/
 *.user
 compile_commands.json
+doxygen-xml/
+doxygen-html/
+docs-api/

@@ -190,6 +190,20 @@ jobs:
           git ls-files 'sdk_cpp/include/**/*.hpp' 'sdk_cpp/src/**/*.[ch]pp' 'sdk_cpp/tests/**/*.[ch]pp' 'sdk_cpp/examples/**/*.cpp' \
             | xargs clang-format --dry-run --Werror
 
+  # Doxyfile sets WARN_AS_ERROR = FAIL_ON_WARNINGS, so a plain `doxygen
+  # Doxyfile` already fails on any undocumented/misattached comment; this
+  # job just runs it. See sdk_cpp/API_DOCUMENTATION.md for the conventions
+  # and how to preview the rendered output locally.
+  api-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen
+      - name: Generate API docs
+        run: doxygen Doxyfile
+        working-directory: sdk_cpp
+
   coverage:
     runs-on: ubuntu-latest
     steps:

@@ -3,19 +3,26 @@
 //
 // Licensed under the BSD-3-Clause license; see LICENSE for details.
 
-//! This is a custom exception thrown by the Driver.
-
 #pragma once
 
 #include <exception>
 #include <string>
 
 namespace Robotiq {
+
+//! \ingroup runtime
+//! \brief A higher-level driver problem that should propagate up to the
+//! application — invalid configuration, a missing/unresponsive gripper,
+//! or a null argument the caller must not have passed.
+//!
+//! Distinct from SerialIOException, which signals a wire-level failure
+//! that the driver's own retry loop handles internally.
 class DriverException : public std::exception
 {
    std::string _what;
 
 public:
+   //! \param description What went wrong; wrapped as "DriverException: <description>.".
    // Plain string concatenation, not <sstream>: stringstream drags in the whole
    // iostream + locale machinery (incl. wide-char printf), which is dead weight
    // — and unlinkable with newlib-nano — on a freestanding target.
@@ -24,6 +31,7 @@ public:
    {
    }
 
+   //! Copy constructor.
    DriverException(const DriverException& other)
       : _what(other._what)
    {
@@ -31,9 +39,10 @@ public:
 
    ~DriverException() override = default;
 
-   // Disable copy constructors
+   //! Disable copy assignment.
    DriverException& operator=(const DriverException&) = delete;
 
+   //! \return The formatted "DriverException: <description>." message.
    [[nodiscard]] const char* what() const throw() override { return _what.c_str(); }
 };
 } // namespace Robotiq

@@ -2,13 +2,6 @@
 //
 // Licensed under the BSD-3-Clause license; see LICENSE for details.
 
-//! \brief Default Logger implementation that writes to stderr.
-//! Hosted-only: it needs <iostream> and a wall clock, neither of which a
-//! freestanding target has — provide an application Logger (e.g. a UART
-//! sink) there instead.
-//! Thread-safe: a single std::mutex serializes writes so interleaved log
-//! lines from concurrent threads aren't garbled.
-
 #pragma once
 
 #include <Robotiq/detail/config.hpp>
@@ -24,9 +17,19 @@
 
 namespace Robotiq {
 
+//! \ingroup runtime
+//! \brief Default Logger implementation that writes to stderr.
+//!
+//! Hosted-only: it needs \<iostream\> and a wall clock, neither of which a
+//! freestanding target has — provide an application Logger (e.g. a UART
+//! sink) there instead.
+//!
+//! Thread-safe: a single std::mutex serializes writes so interleaved log
+//! lines from concurrent threads aren't garbled.
 class StderrLogger : public Logger
 {
 public:
+   //! \copydoc Logger::log
    void log(Level level, std::string_view message) override;
 
 private:

@@ -2,12 +2,6 @@
 //
 // Licensed under the BSD-3-Clause license; see LICENSE for details.
 
-//! \brief Polling helpers for waiting on a condition of the process
-//!        image (whose accessors are instant and never block).
-//! The overloads taking a Platform sleep on it between polls;
-//! the ones without sleep on the default (std::thread-backed) platform
-//! and so exist only on hosted runtimes.
-
 #pragma once
 
 #include <chrono>
@@ -18,9 +12,32 @@
 
 namespace Robotiq {
 
-// Poll predicate until it holds (true) or deadline passes (false).
-// The predicate is evaluated at least once, even past the deadline: an
-// already-true condition never reports a timeout.
+//! \brief Polling helpers for waiting on a condition of the process image
+//! (whose accessors are instant and never block).
+//!
+//! The overloads taking a Platform sleep on it between polls; the ones
+//! without sleep on the default (std::thread-backed) platform and so
+//! exist only on hosted runtimes.
+//!
+//! \par Example
+//! \code{.cpp}
+//! bool settled = Robotiq::waitFor(
+//!    [&] { return gripper.getStatus().positionRequestEcho == target; },
+//!    gripper.platform(),
+//!    std::chrono::seconds(1));
+//! \endcode
+
+//! \ingroup utilities
+//! \brief Poll \p predicate until it holds, or \p deadline passes.
+//!
+//! \p predicate is evaluated at least once, even past the deadline: an
+//! already-true condition never reports a timeout.
+//! \tparam Predicate A callable taking no arguments, returning bool.
+//! \param predicate The condition to wait for.
+//! \param platform Supplies the sleep between polls.
+//! \param deadline The time point past which waiting gives up.
+//! \param pollPeriod How long to sleep between polls.
+//! \return true if \p predicate held before \p deadline; false on timeout.
 template <typename Predicate>
 [[nodiscard]] bool waitUntil(Predicate predicate,
                              Platform& platform,
@@ -41,7 +58,14 @@ template <typename Predicate>
    }
 }
 
-// Poll predicate until it holds (true) or timeout elapses (false).
+//! \ingroup utilities
+//! \brief Poll \p predicate until it holds, or \p timeout elapses.
+//! \tparam Predicate A callable taking no arguments, returning bool.
+//! \param predicate The condition to wait for.
+//! \param platform Supplies the sleep between polls.
+//! \param timeout How long to wait, starting now.
+//! \param pollPeriod How long to sleep between polls.
+//! \return true if \p predicate held within \p timeout; false on timeout.
 template <typename Predicate>
 [[nodiscard]] bool waitFor(Predicate predicate,
                            Platform& platform,
@@ -52,6 +76,9 @@ template <typename Predicate>
 }
 
 #if GRIPPERS_HOSTED
+//! \ingroup utilities
+//! \overload
+//! Sleeps on the default (std::thread-backed) platform. Hosted-only.
 template <typename Predicate>
 [[nodiscard]] bool waitUntil(Predicate predicate,
                              std::chrono::steady_clock::time_point deadline,
@@ -60,6 +87,9 @@ template <typename Predicate>
    return waitUntil(std::move(predicate), *makeDefaultPlatform(), deadline, pollPeriod);
 }
 
+//! \ingroup utilities
+//! \overload
+//! Sleeps on the default (std::thread-backed) platform. Hosted-only.
 template <typename Predicate>
 [[nodiscard]] bool waitFor(Predicate predicate,
                            std::chrono::milliseconds timeout,

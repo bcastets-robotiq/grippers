@@ -1,0 +1,77 @@
+// Copyright (c) 2026 Robotiq, Inc.
+//
+// Licensed under the BSD-3-Clause license; see LICENSE for details.
+//
+// Pure documentation: defines the API reference's grouping/hierarchy for
+// Doxygen. Not a header — nothing includes this file, and it is not part
+// of the CMake target.
+
+//! \defgroup core_api Core API
+//! \brief Everything you need to control a Robotiq gripper over a real
+//! connection.
+//!
+//! **Start with Gripper — everything else in this group exists to build
+//! one, feed it, or read it back.** There is exactly one class to drive;
+//! the rest are the data it moves and the pieces it is built from.
+//!
+//! \code
+//!               ConnectionConfig                Serial + Platform + Logger
+//!             (SerialConfig + slave addr)      (custom transport, RTOS port,
+//!                     |                          or a test double)
+//!                     |    construct()                |    construct()
+//!                     |    (built-in serial)           |    (bring your own)
+//!                     +----------------+----------------+
+//!                                      v
+//!                             +-----------------+
+//!                             |     Gripper     |   <- the class you drive
+//!                             +-----------------+
+//!                            /         |         \
+//!                 setCommand()   getStatus()   connectionState()
+//!                       /             |             \
+//!                      v              v              v
+//!             GripperCommand   GripperStatus   ConnectionState
+//!               (you send)     (FaultStatus
+//!                                lives inside)
+//! \endcode
+//!
+//! activate() and recoverFromFault() are free functions layered on top of
+//! those same accessors — not members — so Gripper itself never blocks;
+//! they poll with the waitFor()/waitUntil() helpers from **Utilities**,
+//! which your own code can use the same way.
+//!
+//!   - **Commands & Status** — the typed blocks Gripper exchanges
+//!     (GripperCommand out, GripperStatus in) and the fault codes they carry.
+//!   - **Connection & Configuration** — how a Gripper is told what to
+//!     connect to, and what state that connection is in.
+//!   - **Runtime & Extension Points** — the injectable pieces (Serial,
+//!     Platform, Logger) Gripper is built on, for custom transports,
+//!     RTOS targets, and tests.
+//!   - **Utilities** — small, independent helpers used while driving a
+//!     Gripper (bit flags, rate limiting, polling).
+//!
+//! See \ref testing "Testing & CI Utilities" for driving this same API
+//! without a physical gripper attached.
+
+//! \defgroup commanding Commands & Status
+//! \ingroup core_api
+//! \brief The typed command and status blocks a Gripper exchanges with
+//! the hardware, and the fault codes carried in the status block.
+
+//! \defgroup connection Connection & Configuration
+//! \ingroup core_api
+//! \brief How a Gripper is configured, and the state of its connection.
+
+//! \defgroup runtime Runtime & Extension Points
+//! \ingroup core_api
+//! \brief The injectable transport, platform, and logging interfaces
+//! Gripper is built on — implement these to add a custom transport, port
+//! to an RTOS, or capture logs in tests.
+
+//! \defgroup utilities Utilities
+//! \ingroup core_api
+//! \brief Small, independent helpers used while driving a Gripper.
+
+//! \defgroup testing Testing & CI Utilities
+//! \brief Tools for exercising the SDK without a physical gripper attached.
+//!
+//! Not part of the real control path — see \ref core_api "Core API" for that.
