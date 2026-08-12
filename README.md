@@ -8,7 +8,6 @@ A C++ SDK for controlling Robotiq 2F adaptive grippers (2F-85 / 2F-140 / Hand-E 
 Cross-platform: Linux, Windows, macOS — and freestanding/RTOS targets such
 as STM32 microcontrollers.
 
-<!-- docs-site:exclude -->
 ## Documentation
 
 - [Introduction](docs/introduction.md)
@@ -16,7 +15,6 @@ as STM32 microcontrollers.
 - [Building and running the example](docs/building-and-running.md)
 - [Using the SDK in your own project](docs/using-the-sdk-in-your-project.md)
 - [Embedded / bare-metal builds](docs/embedded-stm32-builds.md).
-<!-- /docs-site:exclude -->
 
 ## License
 

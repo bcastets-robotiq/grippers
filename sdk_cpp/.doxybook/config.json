@@ -11,10 +11,7 @@
   "folderRelatedPagesName": "Pages",
   "foldersToGenerate": [
     "modules",
-    "classes",
-    "files",
-    "pages",
-    "examples"
+    "classes"
   ],
   "formulaBlockEnd": "\\]",
   "formulaBlockStart": "\\[",
