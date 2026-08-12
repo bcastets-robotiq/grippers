@@ -47,19 +47,40 @@ class Serial;
 //! hold the internal lock those accessors use for longer than an
 //! instant, the way an equivalent member function easily could.
 //!
-//! See the project README's Usage section for the full connect →
+//! \par Two constructors, for two different situations
+//! These are two independent overloads, not one constructor with more
+//! optional parameters — the compiler picks between them at compile time,
+//! from the number and types of arguments you pass:
+//! - The `ConnectionConfig`-based constructor below is the common case:
+//!   a desktop app talking to a gripper over a real serial port. Its
+//!   `logger` is that constructor's *2nd* parameter.
+//! - The `Serial`/`Platform`-based constructor further below is for
+//!   everything else that isn't that: a custom transport, a unit test
+//!   double, or a freestanding/RTOS target with no libserialport. Its
+//!   `logger` is that constructor's *5th* parameter — a different
+//!   parameter of a different function, even though both happen to be
+//!   named `logger` and both default to `nullptr` (meaning "use the
+//!   SDK's own default logger", not "no logging").
+//!
+//! See the SDK documentation's "How it works" page for the full connect →
 //! activate → command → status walkthrough, with the field-by-field
-//! reference for GripperCommand and GripperStatus.
+//! reference for GripperCommand and GripperStatus, and "Embedded /
+//! bare-metal builds" for when the second constructor applies.
 class Gripper
 {
 public:
 #if GRIPPERS_BUILD_DEFAULT_SERIAL
    //! \brief Open a gripper over the built-in serial transport.
+   //!
+   //! The common-case constructor: a real gripper over a real serial port.
    //! \param config Serial link and Modbus addressing; see ConnectionConfig.
    //! \param logger Log sink; pass null to use the default stderr logger.
    //! \throw SerialIOException when the port cannot be opened/configured.
    //! \throw DriverException when no gripper answers the initial read, or
    //!        when config.connectionFrequency is invalid.
+   //!
+   //! For custom transports, test doubles, and freestanding/RTOS targets,
+   //! use the other constructor below instead.
    explicit Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger = nullptr);
 #endif
 
@@ -77,6 +98,9 @@ public:
    //! \throw SerialIOException when the port cannot be opened/configured.
    //! \throw DriverException when no gripper answers the initial read, when
    //!        exchangePeriod is invalid, or when platform is null.
+   //!
+   //! For the common case — a real gripper over a real serial port — use
+   //! the other constructor above instead.
    Gripper(std::unique_ptr<Serial> serial,
            uint8_t slaveAddress,
            std::chrono::microseconds exchangePeriod,

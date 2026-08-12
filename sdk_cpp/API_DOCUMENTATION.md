@@ -21,9 +21,8 @@ Two separate pipelines, in two separate repos:
    pipeline — this document only covers the part that lives here.
 
 This repo's job is to produce clean, warning-free XML — the HTML
-preview and the local Doxybook2 run described below are for *your own*
-review before the docs site ever sees the change; neither is generated
-in CI or committed.
+preview described below is for *your own* review before the docs site
+ever sees the change; it isn't generated in CI or committed.
 
 ## Conventions the headers follow
 
@@ -32,8 +31,9 @@ when you add or edit documentation. The first four are about Doxygen
 itself; the last three are lessons learned by actually running the
 output through Doxybook2 — they render fine in Doxygen's own HTML but
 break in the Markdown the site actually uses, so they're easy to miss
-unless you check both (see [Previewing the rendered
-output](#previewing-the-rendered-output)):
+from the HTML preview alone. The full-fidelity site preview (see
+[Previewing the rendered output](#previewing-the-rendered-output)) is
+the only local way to catch them:
 
 - **Use `//!`, never plain `//`, for anything meant to be
   documentation.** Doxygen only recognizes `//!` and `///` as special
@@ -150,7 +150,7 @@ Remove-Item -Recurse -Force doxygen-xml, doxygen-html     # PowerShell
 
 ## Previewing the rendered output
 
-Three levels of fidelity, cheapest first. Run:
+Run:
 
 ```sh
 sdk_cpp/preview_api_docs.sh      # bash — Git Bash on Windows, native on Linux/macOS
@@ -159,51 +159,34 @@ sdk_cpp/preview_api_docs.sh      # bash — Git Bash on Windows, native on Linux
 sdk_cpp/preview_api_docs.ps1     # PowerShell — no Git Bash needed
 ```
 
-Either script:
+Either script runs `doxygen` and opens `doxygen-html/index.html` in
+your browser — a quick sanity check. Catches most problems:
+missing/malformed comments, broken `\ref`/`\see` links, wrong grouping.
+It won't look like the final site (different theme/chrome — and per
+the conventions above, a few things render fine here but break further
+down the pipeline), but it's the fastest loop: edit, re-run, refresh.
 
-1. Runs `doxygen` and opens `doxygen-html/index.html` in your browser —
-   **quick sanity check**. Catches most problems: missing/malformed
-   comments, broken `\ref`/`\see` links, wrong grouping. It won't look
-   like the final site (different theme/chrome — and per the
-   conventions above, a few things render fine here but break further
-   down the pipeline), but it's the fastest loop: edit, re-run, refresh.
-2. If [Doxybook2](https://github.com/matusnovak/doxybook2) is on
-   `PATH`, also runs it against the XML and writes `docs-api/` —
-   **closer check**, the actual Markdown the docs site will receive.
-   Browse it directly, or with VS Code's built-in Markdown preview
-   (`Ctrl+Shift+V`). This is what catches the conventions-section
-   issues above; the HTML preview alone won't.
-
-Doxybook2 has no package-manager install — no npm, winget, or brew
-package exists for it (`contribute.mdx` on the docs site currently
-suggests `npm install`/`npx`, which does not work; that's a docs bug
-there, not here). Download the binary for your OS from
-[the latest release](https://github.com/matusnovak/doxybook2/releases/latest),
-put its `bin/` folder on `PATH`, and re-run the script — it picks it up
-automatically. Without it, you still get the HTML preview from step 1.
-
-Both outputs are gitignored and disposable; the scripts only ever write
-inside `sdk_cpp/doxygen-html/`, `sdk_cpp/doxygen-xml/`, and
-`sdk_cpp/docs-api/` — never elsewhere, and never the committed config
-files.
+The output is gitignored and disposable; the script only ever writes
+inside `sdk_cpp/doxygen-html/` and `sdk_cpp/doxygen-xml/` — never
+elsewhere, and never the committed `Doxyfile`.
 
 ### Full-fidelity: previewing inside the actual docs site
 
-Only reach for this — typically once, right before opening a PR — to
-confirm the reference looks right with the site's real theme, sidebar,
-and page chrome. It requires a local clone of
-`robotiq.github.io` and is genuinely heavier (Node.js, `npm install`,
-wiring this repo in as its `external/` submodule content). See that
-repo's `contribute.mdx`, specifically "Previewing local edits to a
-submodule" and "Optional: full-fidelity preview on this site" — the
-steps above (1 and 2) are meant to catch everything routine first, so
-you rarely need this one.
+The only way to catch the Markdown-specific issues from the
+conventions section above, or to confirm the reference looks right
+with the site's real theme, sidebar, and page chrome. It requires a
+local clone of `robotiq.github.io` and is genuinely heavier (Node.js,
+`npm install`, wiring this repo in as its `external/` submodule
+content). See that repo's `contribute.mdx`, specifically "Previewing
+local edits to a submodule" and "Optional: full-fidelity preview on
+this site". Typically only worth doing once, right before opening a
+PR — the HTML preview above catches everything routine first.
 
 ## What this doesn't cover
 
 The per-tool wrapper page, the sidebar/table wiring, and the site's
-actual theme all live in the separate `robotiq.github.io` repo and
-aren't reproduced by the local Doxybook2 check above — only the
-Markdown content is. A clean local run through both Doxygen and
-Doxybook2 here catches everything content-related; the full-fidelity
-site preview above is what's left.
+actual theme all live in the separate `robotiq.github.io` repo. A clean
+local run through Doxygen here (the HTML preview above) catches most
+content problems; the Markdown-specific issues from the conventions
+section, and everything about how the site actually looks, are only
+caught by the full-fidelity site preview above.
