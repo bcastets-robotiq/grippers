@@ -6,7 +6,7 @@ own build.
 CMake ≥ 3.16, a C++17 compiler, libserialport.
 
 ## Bring the SDK into your project
-Add the **grippers** compelte repository (or just `sdk_cpp/`) as a git submodule inside your own project.
+Add the **grippers** complete repository (or just `sdk_cpp/`) as a git submodule inside your own project.
 
 Navigate to the project folder:
 
@@ -37,17 +37,17 @@ differently — e.g. on a target with no hosted C++ runtime.
 
 ## Compilation environment
 
-The environment to compile the C++ code of the driver differ depending on your operating system.
+The environment to compile the C++ code of the driver differs depending on your operating system.
 
 | Platform | libserialport |
 |----------|----------------|
-| Ubuntu/Debian | `sudo apt install libserialport-dev` |
-| macOS | `brew install libserialport` |
-| Windows | MSYS2 — see [Windows (MSYS2)](#windows-msys2) below |
+| Ubuntu/Debian | native terminal |
+| macOS | native terminal |
+| Windows | MSYS2 — see [Windows](#windows) below |
 
 ### Linux and macOS
 
-As it is dedicated for linux, the installation of the libserialport library on linux or macOS is straitforward.
+The installation of the libserialport library on Linux or macOS is straightforward.
 
 Install libserialport:
 ```sh
@@ -55,10 +55,15 @@ sudo apt install libserialport-dev   # Ubuntu/Debian
 brew install libserialport           # macOS
 ```
 
-## Windows
+### Windows
 
-Because the C++ driver use libserialport library, the way to compile it on windows is a bit specific.
-While the libserialport library supports Windows natively, it uses a Linux-style build system (autotools) that can be difficult to set up directly on Windows. To compile the C++ driver, the trick is to use MSYS2, which provides a Linux-like terminal and development tools on Windows. This allows you to easily build the library using its native Windows backend, generating an .exe file that runs on Windows without any Linux dependence.
+Because the C++ driver uses the libserialport library, compiling it on
+Windows is a bit specific. libserialport supports Windows natively, but
+it uses a Linux-style build system (autotools) that's awkward to set up
+directly on Windows. The trick is to use MSYS2, which provides a
+Linux-like terminal and a prebuilt Windows-native toolchain (GCC,
+CMake, Ninja) so you can build against it directly, without touching
+autotools yourself.
 
 MSYS2 is a Windows distribution of Unix tooling with pacman (the Arch Linux package manager) and a large repository of prebuilt native libraries.
 
@@ -79,13 +84,12 @@ MSYS2 is a Windows distribution of Unix tooling with pacman (the Arch Linux pack
 
 ## Compile from the terminal
 
-Once the SDK is wired into your `CMakeLists.txt` , configuring and building is
+Once the SDK is wired into your `CMakeLists.txt`, configuring and building is
 the same CMake invocation on every platform, from your project's root:
 
 ```sh
-cmake -S sdk_cpp -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
-ctest --test-dir build            # run unit tests, no hardware needed
 ```
 
 **Windows**: run these commands from the **MSYS2 UCRT64** shell (Start
@@ -106,14 +110,14 @@ own application expects (e.g. the serial port):
 ./build/your_app.exe COM3            # Windows
 ```
 
-## Instruction to setup VS Code
+## Instructions to set up VS Code
 
 1. Install the **C/C++** and **CMake Tools** extensions (both
    publisher `ms-vscode`).
-2. **Windows only** — As previously mentionned MSYS2 GCC toolchain is required
-   to compile the libserialport library. Register a compilation kit once via
-   Command Palette → **CMake: Edit User-Local CMake Kits**, so it's offered in
-   every workspace on your machine:
+2. **Windows only** — as mentioned above, you need the MSYS2 GCC
+   toolchain, since libserialport ships no MSVC package. Register a
+   compilation kit once via Command Palette → **CMake: Edit User-Local
+   CMake Kits**, so it's offered in every workspace on your machine:
 
    ```json
    {
