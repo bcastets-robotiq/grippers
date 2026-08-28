@@ -53,12 +53,6 @@ Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
 
 > **Note :**
 > If the gripper is already activated, the activate function does nothing. To force the activation process the gripper activate (rACT) bit has to be set to false or the gripper power has to be removed.
-> ```cpp
->   Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
->   command.action.set(Robotiq::ActionRequestBit::Activate,false);
->   gripper.setCommand(command);
->   bool isReset = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.activated() == false) ;},10s);
-> ```
 
 ### Create a command and send it
 
@@ -88,7 +82,14 @@ The C++ driver comes with a convenient wait function that can be used to wait fo
 
 The wait function is marked `[[nodiscard]]`, which means the result must be saved into a variable, it cannot be discarded.
 
+First we have to wait for the gripper to acknowledge the reception of the
+command. Then we can wait for the command to complete.
+
 ```cpp
+// Wait for the gripper to acknowledge the reception of the command
+bool positionRequestEchoed = Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
+
+// Wait for the gripper to complete the move
 bool settled = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
 ```
 
