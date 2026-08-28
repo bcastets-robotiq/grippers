@@ -55,9 +55,6 @@ sudo apt install libserialport-dev   # Ubuntu/Debian
 brew install libserialport           # macOS
 ```
 
-Then build your code using the following command:
-
-
 ## Windows
 
 Because the C++ driver use libserialport library, the way to compile it on windows is a bit specific.
@@ -75,7 +72,8 @@ MSYS2 is a Windows distribution of Unix tooling with pacman (the Arch Linux pack
    pacman -S --needed mingw-w64-ucrt-x86_64-gcc \
              mingw-w64-ucrt-x86_64-cmake \
              mingw-w64-ucrt-x86_64-ninja \
-             mingw-w64-ucrt-x86_64-libserialport
+             mingw-w64-ucrt-x86_64-libserialport \
+             mingw-w64-ucrt-x86_64-gdb
    ```
 4. You will be prompted to close the shell to complete the install. Close it.
 
@@ -132,12 +130,9 @@ own application expects (e.g. the serial port):
      }
    }
    ```
-3. Command Palette → **CMake: Select a Kit**. On Windows, pick the
-   **MSYS2 UCRT64 GCC** kit
-   registered above — CMake Tools also lists any Visual Studio install
-   it auto-detects, but ignore those, since libserialport ships no MSVC
-   package. On Linux/macOS, pick whichever kit CMake Tools finds for
-   your system compiler.
+3. Command Palette → **CMake: Select a Kit**.
+   On Windows, pick the **MSYS2 UCRT64 GCC** kit registered above.
+   On Linux/macOS, pick whichever kit CMake Tools finds for your system compiler.
 4. **CMake: Configure**, then **CMake: Build** (or the matching buttons
    in the status bar at the bottom of the window).
 5. To run your own target, once it's built: select it as the active
@@ -148,11 +143,6 @@ own application expects (e.g. the serial port):
    serial port like `COM3`), set them once in `cmake.debugConfig.args`
    in your project's `.vscode/settings.json` and the status bar's
    Run/Debug buttons will pass them automatically.
-6. For breakpoint debugging (the bug-icon **Debug** button, or `F5`),
-   install `gdb` first — MSYS2 doesn't include it by default:
-   ```sh
-   pacman -S --needed mingw-w64-ucrt-x86_64-gdb
-   ```
 
 You can develop and test without a physical gripper at all: call
 [`makeFakeGripper()`](3-how-it-works.md#without-a-gripper) instead of
@@ -179,7 +169,6 @@ git add third_party/grippers
   ```sh
   sudo usermod -aG dialout $USER
   ```
-
   Log out and back in (or reboot) for the new group membership to take
   effect — it's read when your login session starts, so a new terminal
   alone isn't enough. Without it, opening the port fails with a
