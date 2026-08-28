@@ -52,6 +52,8 @@ public:
    // \throw DriverException on any transaction failure — Modbus protocol
    //        errors (timeout, CRC, exception response) and wire-level
    //        failures alike.
+   // [[nodiscard]]: the status block is the only observable result of the
+   // transaction; discarding it throws away the reason the call was made.
    [[nodiscard]] GripperStatus readStatus();
 
    // Write the command block (FC 0x10).
@@ -62,6 +64,8 @@ public:
    // FC 0x17 transaction — the exchange step of a communication cycle.
    // \throw DriverException as for readStatus(); note that the exception
    // can happen after the write has been applied.
+   // [[nodiscard]]: the status block is the only observable result of the
+   // transaction; discarding it throws away the reason the call was made.
    [[nodiscard]] GripperStatus exchange(const GripperCommand& command);
 
 private:

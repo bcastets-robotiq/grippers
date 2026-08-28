@@ -20,7 +20,19 @@ OUTPUT_DIRECTORY       =
 
 INPUT                  = include
 RECURSIVE              = YES
+EXCLUDE                = 
 EXCLUDE_PATTERNS       = */detail/*
+EXCLUDE_SYMBOLS        = 
+
+# Document the hosted API surface, including the ConnectionConfig constructor
+# guarded by GRIPPERS_BUILD_DEFAULT_SERIAL in the public header. This is a
+# compile-time preprocessor macro, normally supplied by the CMake option with
+# the same name; it is not a runtime or operating-system environment variable.
+# A value of 1 includes the libserialport-backed default Serial transport and
+# the ConnectionConfig constructor. A value of 0 omits those pieces so users
+# can provide their own Serial implementation instead.
+PREDEFINED             = GRIPPERS_HOSTED=1 GRIPPERS_BUILD_DEFAULT_SERIAL=1
+
 
 GENERATE_HTML          = YES
 HTML_OUTPUT            = doxygen-html
@@ -39,3 +51,5 @@ WARN_AS_ERROR          = FAIL_ON_WARNINGS
 # "Testing & CI Utilities" split; sort them alphabetically so that
 # split — and the subgroup order within Core API — stays deterministic.
 SORT_GROUP_NAMES       = YES
+
+

@@ -50,7 +50,11 @@ class Serial;
 //! \par Two constructors, for two different situations
 //! These are two independent overloads, not one constructor with more
 //! optional parameters — the compiler picks between them at compile time,
-//! from the number and types of arguments you pass:
+//! from the number and types of arguments you pass. The
+//! `ConnectionConfig`-based overload is compiled only when
+//! `GRIPPERS_BUILD_DEFAULT_SERIAL` is `1`; the `Serial`/`Platform`-based
+//! overload is always available and is the path to use when that macro is
+//! `0`:
 //! - The `ConnectionConfig`-based constructor below is the common case:
 //!   a desktop app talking to a gripper over a real serial port. Its
 //!   `logger` is that constructor's *2nd* parameter.
@@ -72,6 +76,9 @@ public:
 #if GRIPPERS_BUILD_DEFAULT_SERIAL
    //! \brief Open a gripper over the built-in serial transport.
    //!
+   //! Available only when `GRIPPERS_BUILD_DEFAULT_SERIAL` is `1`.
+   //! This is normally enabled for hosted desktop builds and disabled for
+   //! freestanding or RTOS builds.
    //! The common-case constructor: a real gripper over a real serial port.
    //! \param config Serial link and Modbus addressing; see ConnectionConfig.
    //! \param logger Log sink; pass null to use the default stderr logger.
@@ -86,6 +93,8 @@ public:
 
    //! \brief Open a gripper over a caller-supplied transport and platform.
    //!
+   //! Available regardless of `GRIPPERS_BUILD_DEFAULT_SERIAL`; use this
+   //! overload when the built-in libserialport transport is disabled.
    //! For custom serial implementations, unit tests, and RTOS targets. The
    //! exchange runs on the given platform — makeDefaultPlatform() on a
    //! hosted runtime, or your RTOS port (see Platform and ports/).
@@ -119,9 +128,13 @@ public:
 
    //! \return The last command block passed to setCommand() — or the
    //!         gripper's own echoed state, before the first call.
+   //! \note [[nodiscard]]: a pure snapshot read with no side effects; calling
+   //!       it only to discard the result is always a mistake.
    [[nodiscard]] GripperCommand getCommand() const;
 
    //! \return A snapshot of the gripper's last received status block.
+   //! \note [[nodiscard]]: a pure snapshot read with no side effects; calling
+   //!       it only to discard the result is always a mistake.
    [[nodiscard]] GripperStatus getStatus() const;
 
    // TODO: add an exchange-cycle sync primitive so a caller's control loop
@@ -131,12 +144,34 @@ public:
    // a human-readable form (named fields, decoded bits and fault codes)
 
    //! \return The current state of the background exchange; see ConnectionState.
+   //! \note [[nodiscard]]: a pure snapshot read with no side effects; calling
+   //!       it only to discard the result is always a mistake.
    [[nodiscard]] ConnectionState connectionState() const;
 
-   //! \brief The Platform this gripper runs on.
+   //! \brief Return the runtime Platform used by this gripper.
    //!
-   //! For composing blocking helpers (as activate() does) that must sleep
-   //! the way this gripper's target sleeps.
+   //! The platform supplies the runtime services needed by the background
+   //! exchange thread: spawning a thread, creating its lock, and yielding
+   //! while waiting. It is selected when the Gripper is constructed —
+   //! `makeDefaultPlatform()` for a hosted application, or a caller-supplied
+   //! RTOS implementation for an embedded target.
+   //!
+   //! Use this accessor when code outside Gripper needs to wait or sleep in
+   //! the same runtime environment. For example, pass it to the Platform
+   //! overload of `waitFor()` when polling a status condition. The returned
+   //! reference is owned by Gripper and remains valid until that Gripper is
+   //! destroyed; callers must not delete or replace it. This function does
+   //! not create a new platform and does not provide direct serial access.
+   //!
+   //! \par Example
+   //! \code{.cpp}
+   //! bool settled = Robotiq::waitFor(
+   //!    [&] { return gripper.getStatus().positionRequestEcho == target; },
+   //!    gripper.platform(),
+   //!    std::chrono::seconds(1));
+   //! \endcode
+   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] Platform& platform() const noexcept;
 
 private:
@@ -144,7 +179,7 @@ private:
    std::unique_ptr<Impl> _impl;
 };
 
-//! \ingroup core_api
+//! \ingroup activation
 //! Result of the blocking activation procedures activate() and recoverFromFault().
 enum class ActivationResult
 {
@@ -156,7 +191,7 @@ enum class ActivationResult
             //!< too little of the timeout remained to run the handshake
 };
 
-//! \relatesalso Gripper
+//! \ingroup activation
 //! \brief Ensure the gripper is activated, blocking until it reports completion.
 //!
 //! A healthy, already-activated gripper is left undisturbed, and an
@@ -167,6 +202,9 @@ enum class ActivationResult
 //! \return Activated or AlreadyActive on success; FaultLatched if a major
 //!         fault blocks activation — call recoverFromFault() instead;
 //!         Timeout if completion never arrived in time.
+//! \note [[nodiscard]]: discarding the result silently misses FaultLatched
+//!       and Timeout — the caller would have no way to tell success from
+//!       a fault or a timed-out handshake.
 //!
 //! \par Example
 //! \code{.cpp}
@@ -177,7 +215,7 @@ enum class ActivationResult
 //! \endcode
 [[nodiscard]] ActivationResult activate(Gripper& gripper, std::chrono::milliseconds timeout = std::chrono::seconds(15));
 
-//! \relatesalso Gripper
+//! \ingroup activation
 //! \brief Run the manual's fault-recovery handshake, unconditionally.
 //!
 //! Clearing rACT resets the gripper — clearing its fault status — and
@@ -187,6 +225,8 @@ enum class ActivationResult
 //! \param gripper The gripper to recover.
 //! \param timeout How long to wait for the handshake to complete.
 //! \return Activated on success; Timeout if completion never arrived in time.
+//! \note [[nodiscard]]: discarding the result silently misses Timeout — the
+//!       caller would have no way to tell the handshake actually completed.
 [[nodiscard]] ActivationResult recoverFromFault(Gripper& gripper,
                                                 std::chrono::milliseconds timeout = std::chrono::seconds(15));
 } // namespace Robotiq

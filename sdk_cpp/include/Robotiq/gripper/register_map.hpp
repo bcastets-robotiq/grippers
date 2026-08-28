@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 
-//! \ingroup commanding
+//! \ingroup register_map
 //! \brief Byte and bit layout of the Robotiq 2F adaptive grippers'
 //! (2F-85 / 2F-140 / Hand-E class) command and status blocks, as
 //! published in the gripper's instruction manual.

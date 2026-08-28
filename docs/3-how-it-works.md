@@ -1,63 +1,71 @@
-# How it works
+# Introduction to Robotiq Gripper control mechanism
+
+Robotiq grippers are controlled writting command and retreive status from its memory. The memory read and write is done using Modbus RTU.
+
+Here below is an overview of gripper registers:
+
+...
+
+Once the gripper get receive a command, the command is executed until complete or until a different command is received.
+
+The basic usage of the gripper consist in sending command and monitor the status to follow the execution. In such usage the frequency of the commands send to the gripper is typically low while the status retrieve frequency can be quite high.
+This is a kind of 1 time command. We request the gripper complete the stask and we let the gripper to complete it.
+
+There are case like realtime control where commands are sent at high frequency. In such situation, the gripper is constantly interrupted in its action to fit with the always changing command.
+Realtime control is use in application such as teleoperation.
+
+# How works the C++ driver
+The c++ driver have been developed with the objective to maximize communication frequency.
 
 The `Gripper` object owns a background thread that continuously exchanges
-FC 0x17 Modbus transaction with the physical gripper — up to ~200 Hz at 115200
-baud. That thread is the only thing that directly communicate with the gripper.
+FC 0x17 Modbus (read&write) transaction with the gripper — up to ~200 Hz at 115200 baud. That thread is the only thing that directly communicate with the gripper.
 
-The `getCommand()`, `setCommand()` and `getStatus()` methods of the `Gripper` object are used
-to interact with the communication thread to set command and retrieve status
-without impacting the blocking the communication thread.
+
+The `getCommand()`, `setCommand()` and `getStatus()` methods of the `Gripper` object are used to pass command or retrieve status from the thread. Look at API documentation for details
 
 ```mermaid
 flowchart LR
     A["Your code"] <-->|"getCommand() <br> setCommand() <br> getStatus()"| B["Gripper Object"]
-    B <-->|"Thread <br> variables"| C["Communication <br> thread"]
-    C <-->|"Modbus RTU <br> up to ~200 Hz"| D[("Physical gripper")]
+    B <-->|"Modbus RTU thread <br> up to ~200 Hz"| D[("Physical gripper")]
 ```
-
-> **Note**
-> setCommand send the command on the *next* exchange cycle.
 
 > **Note**
 > The exchange thread's Modbus protocol layer is
 > [nanoMODBUS](https://github.com/debevv/nanoMODBUS); on desktop, its
 > serial transport is [libserialport](https://sigrok.org/wiki/Libserialport).
 
-Reading status back tells you what actually happened. The [Usage](#usage)
-walkthrough below follows that pattern throughout: send, then poll status
-until you see the effect you're waiting for.
+## Gripper class structure
 
-## Class structure
+A `Gripper` object is build from a `ConnectionConfig` object and a `Logger` object. The `ConnectionConfig` set the serial port, baudrate and communication frequency while the `Logger` define the place where are logged gripper events.
 
-`ConnectionConfig` is what you hand `Gripper` to build one; everything
-else hangs off `Gripper` itself.
+> ** Note **
+> 
+>A `Gripper` object can also be build from a `serial`,`slaveAddress`,`exchangePeriod`,`platform` and `logger`. This contructor is use when deploying the gripper C++ driver on a specific platform like STM32.
 
-`activate()` and `recoverFromFault()`
-are drawn with dashed edges and called out explicitly because they are
-**not members** — they're free functions that take a `Gripper&`, built
-entirely out of the same instant accessors your own code would use
-(see [step 3](#3-activate-it) below if that seems surprising):
+`activate()` and `recoverFromFault()`are functions related to the `Gripper` class but not are not part of it.
 
 ```mermaid
 flowchart TD
-    CC["ConnectionConfig<br/>serial port, baud rate,<br/>Modbus slave address"]
-    ALT["Serial + Platform + Logger<br/>(custom transport / RTOS / tests)"]
-    G["Gripper"]
+    subgraph OPTIONS["Construction options"]
+        CC["ConnectionConfig<br/>(default serial transport)"]
+        ALT1["Serial + Platform<br/>(custom transport / RTOS / tests)"]
+        CC ---|"OR"| ALT1
+    end
+    L["Logger"]
 
-    CC -->|"Gripper(config)"| G
-    ALT -.->|"alternate constructor"| G
+    subgraph GBUBBLE["Gripper Class"]
+        SC["setCommand() <br> getCommand() <br> getStatus()"]
+        CS["connectionState() <br> platform()"]
+    end
 
-    G --> SC["setCommand() <br> getCommand() <br> getStatus()"]
-    G --> CS["connectionState()"]
-    G --> PL["platform()"]
+    OPTIONS --> GBUBBLE
+    L ---> GBUBBLE
 
-    G -.->|"free function, takes Gripper&amp;<br/>NOT a member"| ACT["activate(gripper, timeout)"]:::external
-    G -.->|"free function, takes Gripper&amp;<br/>NOT a member"| RFF["recoverFromFault(gripper, timeout)"]:::external
-    ACT -->|polls| SC
-    RFF -->|polls| SC
+    GBUBBLE -.-|"External control functions"| ACT["Related external functions <br> <br> activate(gripper, timeout) <br> recoverFromFault(gripper, timeout)"]:::external
 
     classDef default fill:#ffffff,stroke:#000000,color:#000000
     classDef external fill:#ffffff,stroke:#000000,color:#000000,stroke-dasharray: 5 5
+    style GBUBBLE fill:#ffffff,stroke:#000000,color:#000000,rx:10,ry:10
 ```
 
 ## Command & status structure
@@ -65,8 +73,22 @@ flowchart TD
 `GripperCommand` (what you send) and `GripperStatus` (what you read
 back) are plain structs — no logic, just fields. Some fields are raw
 numbers you set/read directly; the packed ones decode through a small
-typed accessor into an enum, so you're never comparing against a raw
-byte value yourself:
+typed accessor into an enum (dashed, below), so you're never comparing
+against a raw byte value yourself:
+
+**GripperCommand**
+
+| positionRequest | speed | force | action |
+|---|---|---|---|
+| Integer <br> [0 ; 255] | Integer <br> [0 ; 255] | Integer <br> [0 ; 255] | Enum (ActionRequestBit):<ul><li>Activate</li><li>GoTo</li><li>AutoRelease</li><li>AutoReleaseOpenDirection</li></ul> |
+
+**GripperStatus**
+
+| positionRequestEcho | position | current | gripperStatus | faultStatus |
+|---|---|---|---|---|
+| Integer <br> [0 ; 255] | Integer <br> [0 ; 255] | Integer <br> [0 ; 255] | Enum via `activationState()`:<ul><li>Reset</li><li>InProgress</li><li>Reserved</li><li>Complete</li></ul>Enum via `objectDetection()`:<ul><li>Moving</li><li>DetectedWhileOpening</li><li>DetectedWhileClosing</li><li>AtRequestedPosition</li></ul> | Enum via `severity()`:<ul><li>None</li><li>Warning</li><li>Minor</li><li>Major</li></ul> |
+
+The methods behind that decoding, in full:
 
 ```mermaid
 classDiagram
@@ -199,6 +221,21 @@ only the named outcomes you're comparing against.
 The five steps every application follows, in order. Each builds on the
 one before; together they're the whole flow.
 
+### Before you start: install dependencies and configure your IDE
+
+The SDK is a CMake project. CMake reads [`sdk_cpp/CMakeLists.txt`](../sdk_cpp/CMakeLists.txt)
+to compile the SDK, find its dependencies, and link an application against
+the `Robotiq::grippers` library. For a desktop build you need:
+
+- CMake 3.16 or newer
+- A C++17 compiler
+- `libserialport` for the real serial connection
+
+See [Environment setup](1-Environment%20setup.md) for installing those
+dependencies per platform, bringing the SDK into your own
+`CMakeLists.txt` (vendored via `add_subdirectory()`, or installed and
+resolved with `find_package()`), and configuring VS Code around it.
+
 ### 1. Create a connection
 
 ```cpp
@@ -250,7 +287,7 @@ match the `ConnectionConfig`-based overload used throughout this walkthrough.
 The other overload takes a `Serial`/`Platform` pair instead of a
 `ConnectionConfig`, and is what you reach for on a custom transport or a
 freestanding/RTOS target with no libserialport — see
-[Embedded / bare-metal builds](embedded-stm32-builds.md). It also happens
+[Embedded / bare-metal builds](4-embedded-stm32-builds.md). It also happens
 to have a `logger` parameter defaulting to `nullptr`, but as its *5th*
 parameter rather than its 2nd — a different parameter of a different
 function, not the same one.
@@ -333,9 +370,9 @@ instant you call `setCommand()`. Check `faultStatus` (and its
 `severity()`) before assuming a command succeeded; a `Major` fault
 needs `recoverFromFault()` (step 3) to clear.
 
-For a complete, runnable version of these five steps — and how to
-build and run it — see
-[Building and running the example](building-and-running.md).
+For a complete, runnable version of these five steps, see
+[`move_gripper.cpp`](../sdk_cpp/examples/move_gripper.cpp); for how to
+build and run it, see [Environment setup](1-Environment%20setup.md).
 
 ## Without a gripper
 

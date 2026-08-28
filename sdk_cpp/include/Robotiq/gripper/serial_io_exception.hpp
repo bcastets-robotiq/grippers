@@ -9,7 +9,7 @@
 
 namespace Robotiq {
 
-//! \ingroup runtime
+//! \ingroup exceptions
 //! \brief Thrown by Serial implementations when an IO operation fails in
 //! a way that may be transient (timeout, short read/write, EINTR, etc.).
 //!

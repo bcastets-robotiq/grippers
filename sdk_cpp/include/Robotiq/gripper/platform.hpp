@@ -10,7 +10,7 @@
 
 namespace Robotiq {
 
-//! \ingroup runtime
+//! \ingroup platform
 //! \brief A lock. BasicLockable, so it drops straight into std::lock_guard.
 class Mutex
 {
@@ -23,7 +23,7 @@ public:
    virtual void unlock() = 0;
 };
 
-//! \ingroup runtime
+//! \ingroup platform
 //! \brief A running thread.
 class Thread
 {
@@ -34,7 +34,7 @@ public:
    virtual void join() = 0;
 };
 
-//! \ingroup runtime
+//! \ingroup platform
 //! \brief The OS services Gripper's threaded runtime needs, as an
 //! injectable interface: one exchange thread, one lock, and a yielding
 //! sleep.
@@ -62,6 +62,8 @@ public:
    virtual ~Platform() = default;
 
    //! \return A newly constructed lock.
+   //! \note [[nodiscard]]: discarding the result leaks the only handle to
+   //!       the newly constructed lock.
    [[nodiscard]] virtual std::unique_ptr<Mutex> makeMutex() = 0;
 
    //! \brief Start a thread running \p fn.
@@ -70,6 +72,8 @@ public:
    //! join()ed before destruction.
    //! \param fn The thread's entry function.
    //! \return A handle to the running thread.
+   //! \note [[nodiscard]]: discarding the result leaks the only handle able
+   //!       to join() the thread before destruction.
    [[nodiscard]] virtual std::unique_ptr<Thread> spawn(std::function<void()> fn) = 0;
 
    //! \brief Sleep the calling thread until a monotonic time point, yielding the CPU.
@@ -81,12 +85,14 @@ public:
    virtual void sleepFor(std::chrono::milliseconds duration) = 0;
 };
 
-//! \ingroup runtime
+//! \ingroup platform
 //! \brief The std::thread-backed platform (one shared instance).
 //!
 //! Hosted-only: freestanding builds leave its TU out, so calling this
 //! there fails to link — construct your RTOS platform instead.
 //! \return The shared default Platform instance.
+//! \note [[nodiscard]]: discarding the result throws away the only handle
+//!       to the platform this call was made to obtain.
 [[nodiscard]] std::shared_ptr<Platform> makeDefaultPlatform();
 
 } // namespace Robotiq

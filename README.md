@@ -13,10 +13,9 @@ as STM32 microcontrollers.
 ## Documentation
 
 - [Introduction](docs/introduction.md)
-- [How it works](docs/how-it-works.md)
-- [Building and running the example](docs/building-and-running.md)
-- [Using the SDK in your own project](docs/using-the-sdk-in-your-project.md)
-- [Embedded / bare-metal builds](docs/embedded-stm32-builds.md).
+- [How it works](docs/3-how-it-works.md)
+- [Environment setup](docs/1-Environment%20setup.md)
+- [Embedded / bare-metal builds](docs/4-embedded-stm32-builds.md).
 
 <!-- /docs-site:exclude -->
 

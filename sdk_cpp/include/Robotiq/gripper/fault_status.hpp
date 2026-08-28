@@ -11,7 +11,7 @@
 
 namespace Robotiq {
 
-//! \ingroup commanding
+//! \ingroup fault_status
 //! The gripper's own fault code (gFLT, low nibble of the FAULT STATUS byte).
 enum class GripperFault : uint8_t
 {
@@ -28,7 +28,7 @@ enum class GripperFault : uint8_t
    AutomaticReleaseComplete = 0x0F, //!< rATR emergency release finished
 };
 
-//! \ingroup commanding
+//! \ingroup fault_status
 //! The optional Robotiq controller's fault code (kFLT, high nibble of the FAULT STATUS byte).
 enum class ControllerFault : uint8_t
 {
@@ -40,7 +40,7 @@ enum class ControllerFault : uint8_t
    Overcurrent = 0x0E, //!< controller overcurrent protection tripped
 };
 
-//! \ingroup commanding
+//! \ingroup fault_status
 //! \brief How serious a fault is, per the gripper manual.
 //!
 //! The manual labels the Warning tier "priority faults"; a Major fault
@@ -54,11 +54,13 @@ enum class FaultSeverity : uint8_t
    Major, //!< needs a reset (rACT rising edge) to clear
 };
 
-//! \ingroup commanding
+//! \ingroup fault_status
 //! \brief Classify a gripper fault code by severity.
 //! \param fault The gripper's own fault code, from FaultStatus::gripperFault().
 //! \return The fault's severity. Unrecognized codes report Major so an
 //!         unknown fault is never mistaken for harmless.
+//! \note [[nodiscard]]: a pure classification with no side effects; calling
+//!       it only to discard the result is always a mistake.
 [[nodiscard]] constexpr FaultSeverity severity(GripperFault fault)
 {
    switch(fault)
@@ -82,11 +84,13 @@ enum class FaultSeverity : uint8_t
    return FaultSeverity::Major;
 }
 
-//! \ingroup commanding
+//! \ingroup fault_status
 //! \brief Classify a controller fault code by severity.
 //! \param fault The controller's fault code, from FaultStatus::controllerFault().
 //! \return The fault's severity. Unrecognized codes report Major so an
 //!         unknown fault is never mistaken for harmless.
+//! \note [[nodiscard]]: a pure classification with no side effects; calling
+//!       it only to discard the result is always a mistake.
 [[nodiscard]] constexpr FaultSeverity severity(ControllerFault fault)
 {
    switch(fault)
@@ -105,7 +109,7 @@ enum class FaultSeverity : uint8_t
    return FaultSeverity::Major;
 }
 
-//! \ingroup commanding
+//! \ingroup fault_status
 //! \brief The FAULT STATUS byte (byte 2 of the status block).
 //!
 //! Splits into the gripper's own fault (gFLT, low nibble) and the
@@ -127,6 +131,8 @@ public:
    //! For simulators and for exercising fault handling without hardware.
    //! \param bits The raw FAULT STATUS byte.
    //! \return A FaultStatus wrapping \p bits.
+   //! \note [[nodiscard]]: a pure factory with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] static constexpr FaultStatus fromRaw(uint8_t bits)
    {
       FaultStatus status;
@@ -135,12 +141,16 @@ public:
    }
 
    //! \return gFLT — the gripper's own fault code.
+   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] GripperFault gripperFault() const
    {
       return static_cast<GripperFault>(_bits & register_map::kGripperFaultMask);
    }
 
    //! \return kFLT — the optional Robotiq controller's fault code.
+   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] ControllerFault controllerFault() const
    {
       return static_cast<ControllerFault>((_bits & register_map::kControllerFaultMask)
@@ -148,11 +158,17 @@ public:
    }
 
    //! \return The raw FAULT STATUS byte, unpacked.
+   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] uint8_t raw() const { return _bits; }
 
    //! \return true if both fault bytes are identical.
+   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
+   //!       it only to discard the result is always a mistake.
    [[nodiscard]] bool operator==(FaultStatus other) const { return _bits == other._bits; }
    //! \return true if the fault bytes differ.
+   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
+   //!       it only to discard the result is always a mistake.
    [[nodiscard]] bool operator!=(FaultStatus other) const { return _bits != other._bits; }
 
 private:

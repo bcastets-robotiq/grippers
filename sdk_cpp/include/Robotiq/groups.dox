@@ -7,19 +7,17 @@
 // of the CMake target.
 
 //! \defgroup core_api Core API
-//! \brief Everything you need to control a Robotiq gripper over a real
-//! connection.
+//! \brief Everything you need to control a Robotiq gripper.
 //!
-//! **Start with Gripper — everything else in this group exists to build
-//! one, feed it, or read it back.** There is exactly one class to drive;
-//! the rest are the data it moves and the pieces it is built from.
+//! The gripper SDK is composed for the Gripper class associated with
+//! related tools to works with Gripper class objects.
 //!
 //! \code
 //!               ConnectionConfig                Serial + Platform + Logger
-//!             (SerialConfig + slave addr)      (custom transport, RTOS port,
-//!                     |                          or a test double)
-//!                     |    construct()                |    construct()
-//!                     |    (built-in serial)           |    (bring your own)
+//!             (SerialConfig + slave addr)     (custom transport, RTOS port,
+//!                     |                             or a test double)
+//!                     |                                 |    
+//!                     |    (built-in serial)            |    (bring your own serial)
 //!                     +----------------+----------------+
 //!                                      v
 //!                             +-----------------+
@@ -34,10 +32,16 @@
 //!                                lives inside)
 //! \endcode
 //!
-//! activate() and recoverFromFault() are free functions layered on top of
-//! those same accessors — not members — so Gripper itself never blocks;
-//! they poll with the waitFor()/waitUntil() helpers from **Utilities**,
-//! which your own code can use the same way.
+//! \note all gripper methods are not represented in this graph. check gripper
+//! class documentation for details.
+//!
+//! While Gripper class methods like setCommand and getStatus are enougth
+//! to control the gripper, high level functions are provided to
+//! ease some actions like activation and fault recovery. Those functions are
+//! not members of the gripper class and direclty use gripper object
+//! to perform an action.
+//!
+//! Core API documentation is organized as follow: 
 //!
 //!   - **Commands & Status** — the typed blocks Gripper exchanges
 //!     (GripperCommand out, GripperStatus in) and the fault codes they carry.
@@ -48,14 +52,60 @@
 //!     RTOS targets, and tests.
 //!   - **Utilities** — small, independent helpers used while driving a
 //!     Gripper (bit flags, rate limiting, polling).
+//!   - **Register Map & Masks** — the raw byte layout beneath Commands &
+//!     Status, for no-thread integrations decoding bytes directly.
 //!
 //! See \ref testing "Testing & CI Utilities" for driving this same API
 //! without a physical gripper attached.
 
 //! \defgroup commanding Commands & Status
 //! \ingroup core_api
-//! \brief The typed command and status blocks a Gripper exchanges with
-//! the hardware, and the fault codes carried in the status block.
+//! \brief The typed blocks a Gripper exchanges with the hardware: the
+//! command you write to it, and the status you read back from it.
+//!
+//! Mirrors the manual's own block layout:
+//!   - **Command** — what you write: GripperCommand, a 6-byte block
+//!     whose action byte (byte 0) packs individual request bits.
+//!   - **Status** — what you read back: GripperStatus, a 6-byte block
+//!     whose **Gripper Status** (byte 0) and **Fault Status** (byte 2)
+//!     bytes each pack individual flags.
+//!   - **Activation** — the blocking procedures built on top of both.
+
+//! \defgroup command Command
+//! \ingroup commanding
+//! \brief What you send to the gripper to perform an action.
+
+//! \defgroup action ActionByte
+//! \ingroup command
+//! \brief The packed action-request byte (byte 0 of the command block).
+
+//! \defgroup status Status
+//! \ingroup commanding
+//! \brief The information you recieve to understand gripper
+//! status.
+
+//! \defgroup gripper_status Gripper Status
+//! \ingroup status
+//! \brief The packed GRIPPER STATUS byte (byte 0 of the status block).
+
+//! \defgroup fault_status Fault Status
+//! \ingroup status
+//! \brief The packed FAULT STATUS byte (byte 2 of the status block).
+
+//! \defgroup activation Activation &  Recovery
+//! \ingroup commanding
+//! \brief The blocking activation / fault-recovery procedures built on
+//! top of Command and Status.
+
+//! \defgroup register_map Register Map & Masks
+//! \ingroup core_api
+//! \brief The raw byte and bit layout behind Commands & Status — the
+//! manual's block table, masks, and shifts.
+//!
+//! Most consumers never need this: GripperCommand, GripperStatus,
+//! GripperStatusFlags, and FaultStatus already expose everything here as
+//! named fields and accessors. Reach for it directly only below that
+//! typed layer, e.g. decoding a raw byte in a no-thread integration.
 
 //! \defgroup connection Connection & Configuration
 //! \ingroup core_api
@@ -66,6 +116,34 @@
 //! \brief The injectable transport, platform, and logging interfaces
 //! Gripper is built on — implement these to add a custom transport, port
 //! to an RTOS, or capture logs in tests.
+//!
+//! Split by what you're implementing, plus what a failure in any of them
+//! looks like to the caller:
+//!   - **Transport** — the byte-level link to the hardware (Serial).
+//!   - **Platform** — the OS services the threaded runtime needs
+//!     (locks, threads, sleeps).
+//!   - **Logging** — where diagnostic lines go.
+//!   - **Exceptions** — the driver- and transport-level failures thrown
+//!     up through these interfaces.
+
+//! \defgroup transport Transport
+//! \ingroup runtime
+//! \brief Byte-level transport to the gripper hardware — the transport
+//! extension point.
+
+//! \defgroup platform Platform
+//! \ingroup runtime
+//! \brief The OS services (locks, threads, sleeps) Gripper's threaded
+//! runtime needs, as an injectable interface.
+
+//! \defgroup logging Logging
+//! \ingroup runtime
+//! \brief Where diagnostic log lines from Robotiq components go.
+
+//! \defgroup exceptions Exceptions
+//! \ingroup runtime
+//! \brief What a failure in the transport or driver itself looks like
+//! to the caller.
 
 //! \defgroup utilities Utilities
 //! \ingroup core_api

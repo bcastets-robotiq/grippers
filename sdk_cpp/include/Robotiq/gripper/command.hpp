@@ -15,7 +15,7 @@
 
 namespace Robotiq {
 
-//! \ingroup commanding
+//! \ingroup action
 //! \brief Bit layout of the action-request byte (byte 0 of the command block):
 //! \code
 //!   bit    7     6     5     4     3     2     1     0
@@ -29,11 +29,27 @@ enum class ActionRequestBit : uint8_t
    AutoReleaseOpenDirection = 5, //!< rARD — set = open direction
 };
 
-//! \ingroup commanding
-//! The packed action-request byte, as a set of ActionRequestBit flags.
+//! \ingroup action
+//! \brief The packed action-request byte (byte 0 of the command block), as
+//! a set of ActionRequestBit flags.
+//!
+//! Individual bits are read and written through NamedBitArray's `set()`
+//! and `get()`, naming the bit with an ActionRequestBit enumerator instead
+//! of a raw bit position. `set(bit)` always sets the bit true; pass an
+//! explicit `on` argument — `set(bit, on)` — only when you need to clear
+//! it or the state comes from a variable.
+//!
+//! \par Example
+//! \code{.cpp}
+//! Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+//! command.action.set(Robotiq::ActionRequestBit::GoTo);                  // start moving (same as set(GoTo, true))
+//! command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);    // ...but not an emergency release
+//! bool goTo = command.action.get(Robotiq::ActionRequestBit::GoTo);      // true
+//! gripper.setCommand(command);
+//! \endcode
 using ActionRequest = NamedBitArray<ActionRequestBit>;
 
-//! \ingroup commanding
+//! \ingroup command
 //! \brief The gripper command block (host -> gripper), laid out byte for
 //! byte as the instruction manual's block table.
 //!
@@ -61,11 +77,18 @@ struct GripperCommand
    //! bytes 6..15
    std::array<uint8_t, register_map::kCommandBlockBytes - register_map::kCommandDocumentedBytes> reservedTail{};
 
-   //! \brief A ready-to-use command: activated (rACT), no motion, and the
+   //! \brief A ready-to-use command:
+   //! - Activation request (rACT): True
+   //! - GoTo request (rGTO): False
+   //! - AutoRelease request: False
+   //! - AutoReleaseOpenDirection : False (Closing auto-release)
+   //! - Speed : 255
+   //! - Force : 255
    //! speed and force the Robotiq URCap defaults to (both maximum).
    //!
-   //! Default construction is all-zero; this opts into those values.
    //! \return A GripperCommand with Activate set and speed/force at maximum.
+   //! \note [[nodiscard]]: a pure factory with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] constexpr static GripperCommand defaults()
    {
       GripperCommand command;
@@ -76,19 +99,27 @@ struct GripperCommand
    }
 
    //! \return Raw block access, the manual's byte order. size() bytes wide.
+   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] const uint8_t* data() const { return reinterpret_cast<const uint8_t*>(this); }
    //! \overload
    [[nodiscard]] uint8_t* data() { return reinterpret_cast<uint8_t*>(this); }
    //! \return The width of the command block in bytes (16, per the manual).
+   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
+   //!       only to discard the result is always a mistake.
    [[nodiscard]] static constexpr std::size_t size() { return register_map::kCommandBlockBytes; }
 };
 
 //! \return true if every byte of the two command blocks is identical.
+//! \note [[nodiscard]]: a pure comparison with no side effects; calling it
+//!       only to discard the result is always a mistake.
 [[nodiscard]] inline bool operator==(const GripperCommand& lhs, const GripperCommand& rhs)
 {
    return std::memcmp(lhs.data(), rhs.data(), GripperCommand::size()) == 0;
 }
 //! \return true if any byte of the two command blocks differs.
+//! \note [[nodiscard]]: a pure comparison with no side effects; calling it
+//!       only to discard the result is always a mistake.
 [[nodiscard]] inline bool operator!=(const GripperCommand& lhs, const GripperCommand& rhs)
 {
    return !(lhs == rhs);

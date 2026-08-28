@@ -17,7 +17,7 @@
 
 namespace Robotiq {
 
-//! \ingroup runtime
+//! \ingroup logging
 //! \brief Default Logger implementation that writes to stderr.
 //!
 //! Hosted-only: it needs \<iostream\> and a wall clock, neither of which a

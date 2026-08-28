@@ -7,21 +7,23 @@
 //! jaws clear.
 //! Usage: move_gripper <port> [baudrate]
 
-#include <chrono>
-#include <cstdlib>
-#include <memory>
-#include <iostream>
-#include <string>
+#include <chrono>   // duration literals for the waitFor() timeouts below (1s, 200ms, ...)
+#include <cstdlib>  // EXIT_SUCCESS / EXIT_FAILURE, main()'s return codes below — unrelated to Gripper itself
+#include <memory>   // smart pointers: std::unique_ptr to own the Gripper, std::shared_ptr for the Logger it takes
+#include <iostream> // std::cerr for usage/connection error messages
+#include <string>   // std::to_string, std::stoul (baudrate parsing)
 
-#include <Robotiq/gripper.hpp>
-#include <Robotiq/gripper/stderr_logger.hpp>
+#include <Robotiq/gripper.hpp>              // Gripper, GripperCommand/Status, activate(), recoverFromFault()
+#include <Robotiq/gripper/stderr_logger.hpp> // StderrLogger: the SDK's default Logger, writes to stderr
 
-using namespace std::chrono_literals;
-using Robotiq::ActionRequestBit;
-using Robotiq::ActivationResult;
-using Robotiq::Gripper;
-using Robotiq::GripperCommand;
-using Robotiq::ObjectDetection;
+using namespace std::chrono_literals; // enables the 1s / 200ms / 5s literals below
+
+// The handful of SDK types this example touches directly:
+using Robotiq::ActionRequestBit; // rACT/rGTO/... bit positions in the command's action byte
+using Robotiq::ActivationResult; // outcome of activate() / recoverFromFault()
+using Robotiq::Gripper;          // the connection: owns the link and the background exchange
+using Robotiq::GripperCommand;   // host -> gripper command block (position, speed, force, action bits)
+using Robotiq::ObjectDetection;  // gOBJ: moving / stopped-on-object / at-requested-position
 
 namespace {
 // Any rate a serial link plausibly runs at. Also what catches a negative:
@@ -29,14 +31,31 @@ namespace {
 constexpr unsigned long kMinBaudrate = 1;
 constexpr unsigned long kMaxBaudrate = 1000000;
 
+//! \brief Whether the fingers have stopped moving.
+//!
+//! gOBJ reads Moving both while the fingers are actually moving and before
+//! any motion has been requested yet, so "not Moving" is the settled state:
+//! either it stopped on an object, or it reached the requested position.
+//! \param gripper The gripper to read status from.
+//! \return true once motion has settled (stopped on an object, or reached
+//!         the requested position); false while still moving.
 bool motionSettled(Gripper& gripper)
 {
    return gripper.getStatus().gripperStatus.objectDetection() != ObjectDetection::Moving;
 }
 
-// Request a position, wait for the gripper to acknowledge the request
-// (gPR echo), then wait for the motion to settle. False if either wait
-// timed out — a wait result is never worth dropping.
+//! \brief Send the gripper to a position and block until it gets there.
+//!
+//! Request a position, wait for the gripper to acknowledge the request
+//! (gPR echo), then wait for the motion to settle. False if either wait
+//! timed out — a wait result is never worth dropping.
+//! \param gripper The gripper to command.
+//! \param command The persistent command block; positionRequest and the
+//!        GoTo bit are set on it before sending.
+//! \param position Target rPR, 0 (open) .. 255 (closed).
+//! \param logger Where to narrate progress and report failures.
+//! \return true once the gripper echoed the request and motion settled;
+//!         false if either wait timed out.
 bool moveTo(Gripper& gripper, GripperCommand& command, uint8_t position, Robotiq::Logger& logger)
 {
    command.positionRequest = position;
@@ -65,6 +84,11 @@ bool moveTo(Gripper& gripper, GripperCommand& command, uint8_t position, Robotiq
 }
 } // namespace
 
+//! \brief Connect, activate, open, then close — see the file header comment.
+//! \param argc Argument count; expects 2 or 3 (program name, port, [baudrate]).
+//! \param argv argv[1] is the serial port; argv[2], if given, is the baudrate.
+//! \return EXIT_SUCCESS on a full connect/activate/open/close cycle;
+//!         EXIT_FAILURE on a bad argument, a connection error, or a timeout.
 int main(int argc, char* argv[])
 {
    if(argc < 2)
@@ -73,6 +97,9 @@ int main(int argc, char* argv[])
       return EXIT_FAILURE;
    }
 
+   // ConnectionConfig bundles the serial link and Modbus addressing; the
+   // slave address and exchange frequency default to sane values, so only
+   // the port (and optionally the baudrate) need to be filled in here.
    Robotiq::ConnectionConfig config;
    config.serial.port = argv[1];
    if(argc > 2)
@@ -97,6 +124,11 @@ int main(int argc, char* argv[])
    // for its own narration so all lines land on one ordered stream.
    auto logger = std::make_shared<Robotiq::StderrLogger>();
 
+   // Constructing Gripper opens the serial port, does one initial read to
+   // confirm a gripper answers, and starts the background exchange thread
+   // that keeps sending the last command and reading status. From here,
+   // setCommand()/getStatus() just touch an in-memory snapshot: they never
+   // block on the bus themselves.
    std::unique_ptr<Gripper> gripper;
    try
    {
@@ -112,6 +144,10 @@ int main(int argc, char* argv[])
       return EXIT_FAILURE;
    }
 
+   // activate() blocks until the gripper reports the activation handshake
+   // complete (or Timeout/AlreadyActive/FaultLatched). It's a free function,
+   // not a Gripper member, because every Gripper member call returns
+   // instantly — this one polls getStatus()/setCommand() in a loop instead.
    logger->log(Robotiq::Logger::Level::Info, "Activating...");
    ActivationResult activation = Robotiq::activate(*gripper);
    if(activation == ActivationResult::FaultLatched)
@@ -130,15 +166,15 @@ int main(int argc, char* argv[])
    // Keep one command block and update it before each send: it is
    // persistent state, not rebuilt per move.
    GripperCommand command = GripperCommand::defaults(); // GoTo added by moveTo
-
+   
    logger->log(Robotiq::Logger::Level::Info, "Opening...");
-   if(!moveTo(*gripper, command, 0, *logger))
+   if(!moveTo(*gripper, command, 0, *logger)) // rPR = 0: fully open
    {
       return EXIT_FAILURE;
    }
 
    logger->log(Robotiq::Logger::Level::Info, "Closing...");
-   if(!moveTo(*gripper, command, 255, *logger))
+   if(!moveTo(*gripper, command, 255, *logger)) // rPR = 255: fully closed
    {
       return EXIT_FAILURE;
    }

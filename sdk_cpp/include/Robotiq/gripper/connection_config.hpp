@@ -28,6 +28,7 @@ inline constexpr uint8_t kDefaultModbusSlaveAddress = 0x09;
 //! \par Example
 //! \code{.cpp}
 //! Robotiq::ConnectionConfig config;
+//! config.modbusSlaveAddress = 0x09;
 //! config.serial.port = "/dev/ttyUSB0";
 //! config.serial.baudrate = 115200;
 //! config.connectionFrequency = 100.0;   // Hz

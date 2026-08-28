@@ -9,7 +9,7 @@
 
 namespace Robotiq {
 
-//! \ingroup runtime
+//! \ingroup logging
 //! \brief Minimal logging surface for Robotiq components.
 //!
 //! Abstracts logging so the SDK can be used in three contexts:
@@ -57,7 +57,7 @@ public:
    virtual void log(Level level, std::string_view message) = 0;
 };
 
-//! \ingroup runtime
+//! \ingroup logging
 //! \brief A do-nothing Logger, useful in tight benchmarks or tests.
 class NullLogger : public Logger
 {
@@ -66,7 +66,7 @@ public:
    void log(Level, std::string_view) override;
 };
 
-//! \ingroup runtime
+//! \ingroup logging
 //! \brief Build the default logger used when callers don't inject one.
 //!
 //! StderrLogger on a hosted runtime, NullLogger on a freestanding target
