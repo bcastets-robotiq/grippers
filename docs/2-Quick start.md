@@ -53,6 +53,8 @@ Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
 
 > **Note :**
 > If the gripper is already activated, the activate function does nothing. To force the activation process the gripper activate (rACT) bit has to be set to false or the gripper power has to be removed.
+>
+> This is different from `recoverFromFault()`, which also reactivates the gripper immediately (running the calibration sweep) as part of the same call — use the approach above instead if you want the gripper to stay deactivated until you call `activate()` yourself.
 
 ### Create a command and send it
 

@@ -12,9 +12,11 @@ as STM32 microcontrollers.
 
 ## Documentation
 
-- [Introduction to gripper control](docs/3-Introduction%20to%20gripper%20control.md)
 - [Environment setup](docs/1-Environment%20setup.md)
-- [Embedded / bare-metal builds](docs/4-embedded-stm32-builds.md).
+- [Quick start](docs/2-Quick%20start.md)
+- [Introduction to gripper control](docs/3-Introduction%20to%20gripper%20control.md)
+- [Robust example walkthrough](docs/4-Robust%20example%20walkthrough.md)
+- [Embedded / bare-metal builds](docs/5-embedded-stm32-builds.md).
 
 <!-- /docs-site:exclude -->
 

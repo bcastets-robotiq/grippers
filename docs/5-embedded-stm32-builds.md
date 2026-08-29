@@ -3,9 +3,10 @@
 This page explains how the SDK compiles for a microcontroller target
 (STM32-class and similar) that has no operating system underneath it —
 no `std::thread`, no filesystem, often no heap of any real size. If
-you've only used the SDK on Linux/Windows/macOS so far, start with
-[How it works](3-Introduction%20to%20gripper%20control.md) first; this page assumes you already
-know what `Gripper`, `Platform` and `Serial` are.
+you've only used the SDK on Linux/Windows/macOS so far, read
+[Quick start](2-Quick%20start.md) first for the basic `Gripper`
+connect → activate → command → status flow this page builds on;
+`Platform` and `Serial` are introduced below.
 
 ## The core idea
 
@@ -37,7 +38,7 @@ an RTOS running.
 ### 1. You have an RTOS: implement `Platform`
 
 Keep using `Gripper` exactly as described in
-[How it works](3-Introduction%20to%20gripper%20control.md) — same `activate()`, `setCommand()`,
+[Quick start](2-Quick%20start.md) — same `activate()`, `setCommand()`,
 `getStatus()` — but construct it with the platform-taking constructor
 instead of a `ConnectionConfig`, passing your own `Platform` and
 `Serial`.

@@ -134,6 +134,15 @@ own application expects (e.g. the serial port):
      }
    }
    ```
+
+   Together these settings produce a fully static executable:
+   `SERIALPORT_LIBRARY` points at libserialport's static archive instead
+   of its `.dll`, and `-static -static-libgcc -static-libstdc++`
+   statically links the C/C++ runtime too — without that second part
+   you'd still need MSYS2's own `libstdc++`/`libgcc` DLLs at runtime
+   even with libserialport itself linked statically. That's what lets
+   what you build run on any Windows machine with no MSYS2 or its DLLs
+   installed.
 3. Command Palette → **CMake: Select a Kit**.
    On Windows, pick the **MSYS2 UCRT64 GCC** kit registered above.
    On Linux/macOS, pick whichever kit CMake Tools finds for your system compiler.
@@ -149,9 +158,9 @@ own application expects (e.g. the serial port):
    Run/Debug buttons will pass them automatically.
 
 You can develop and test without a physical gripper at all: call
-[`makeFakeGripper()`](3-Introduction%20to%20gripper%20control.md#without-a-gripper) instead of
-constructing a `Gripper` from a `ConnectionConfig` — same API from
-there on, so swapping in a real gripper later is a one-line change.
+[`makeFakeGripper()`](../sdk_cpp/include/Robotiq/gripper/fake/gripper_factory.hpp)
+instead of constructing a `Gripper` from a `ConnectionConfig` — same API
+from there on, so swapping in a real gripper later is a one-line change.
 
 ## Updating the SDK later
 
@@ -206,7 +215,7 @@ git add third_party/grippers
 adjust them when you're consuming the SDK differently: as a dependency
 that shouldn't build its own examples/tests, or on a target that
 doesn't have a hosted C++ runtime (see
-[Embedded / bare-metal builds](4-embedded-stm32-builds.md) for that case
+[Embedded / bare-metal builds](5-embedded-stm32-builds.md) for that case
 in detail).
 
 | Option | Default | What it controls |
@@ -214,7 +223,7 @@ in detail).
 | `GRIPPERS_BUILD_EXAMPLES` | `ON` when top-level, `OFF` via `add_subdirectory()` | Builds `examples/move_gripper`. |
 | `GRIPPERS_BUILD_TESTS` | `ON` when top-level, `OFF` via `add_subdirectory()` | Builds and registers the unit tests with CTest. |
 | `GRIPPERS_HOSTED` | `ON` | Whether the target has a hosted C++ runtime (`std::thread`, `iostream`). `ON` compiles the `std::thread`-backed `Platform` (`makeDefaultPlatform()`) and the stderr default logger, and links `Threads::Threads`. |
-| `GRIPPERS_BUILD_FAKE` | follows `GRIPPERS_HOSTED` | Builds `makeFakeGripper()` and the fake device it drives (see [How it works → Without a gripper](3-Introduction%20to%20gripper%20control.md#without-a-gripper)). ~30 KB; only useful to hosted consumers, since the fake device needs the threaded exchange loop to run. |
+| `GRIPPERS_BUILD_FAKE` | follows `GRIPPERS_HOSTED` | Builds [`makeFakeGripper()`](../sdk_cpp/include/Robotiq/gripper/fake/gripper_factory.hpp) and the fake device it drives. ~30 KB; only useful to hosted consumers, since the fake device needs the threaded exchange loop to run. |
 | `GRIPPERS_BUILD_DEFAULT_SERIAL` | follows `GRIPPERS_HOSTED` | Builds the libserialport-backed `DefaultSerial` and the `ConnectionConfig`-based constructors that use it. |
 
 "Top-level" means configuring `sdk_cpp` directly
