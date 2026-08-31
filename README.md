@@ -14,7 +14,7 @@ as STM32 microcontrollers.
 
 - [Environment setup](docs/1-Environment%20setup.md)
 - [Quick start](docs/2-Quick%20start.md)
-- [Introduction to gripper control](docs/3-Introduction%20to%20gripper%20control.md)
+- [How it works](docs/3-How%20it%20works.md)
 - [Robust example walkthrough](docs/4-Robust%20example%20walkthrough.md)
 - [Embedded / bare-metal builds](docs/5-embedded-stm32-builds.md).
 

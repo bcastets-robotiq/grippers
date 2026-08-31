@@ -1,10 +1,14 @@
 # Quick start
 
 This is a minimalist introduction showing how to control the gripper using the C++ driver.
+
 Refer to API documentation to get more details.
 
 > **Note :**
 > This example does not handle potential errors. Refer to move_gripper.cpp for a robust example.
+
+> **Note :**
+> The code of this example is in the file quick_start.cpp.
 
 ## Import dependencies
 
@@ -56,7 +60,7 @@ Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
 >
 > This is different from `recoverFromFault()`, which also reactivates the gripper immediately (running the calibration sweep) as part of the same call — use the approach above instead if you want the gripper to stay deactivated until you call `activate()` yourself.
 
-### Create a command and send it
+### Create a command
 
 To control the gripper you have to write a command with appropriate parameter and send it.
 

@@ -3,7 +3,7 @@
 [Quick start](2-Quick%20start.md) shows the bare minimum to move a
 gripper and explicitly skips error handling. [`move_gripper.cpp`](../sdk_cpp/examples/move_gripper.cpp)
 is the same connect → activate → command → wait → status flow made
-robust, using the functions from [Introduction to gripper control](3-Introduction%20to%20gripper%20control.md).
+robust, using the functions from [How it works](3-How%20it%20works.md).
 This page doesn't re-walk that flow — it covers what's different about
 the robust version and why.
 
@@ -41,7 +41,7 @@ from the actual mistake.
 ## Reporting a failed connection
 
 Constructing `Gripper` can throw (`SerialIOException` or
-`DriverException` — see [Error handling](3-Introduction%20to%20gripper%20control.md#error-handling)).
+`DriverException` — see [Error handling](3-How%20it%20works.md#error-handling)).
 The example catches it once, right at construction, and turns it into a
 checklist instead of a raw exception message:
 

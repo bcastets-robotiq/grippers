@@ -1,4 +1,4 @@
-# Introduction to Gripper control
+# How it works
 
 Robotiq grippers are controlled by writing commands to, and reading status from, their memory. The memory read and write is done using Modbus RTU.
 
@@ -7,6 +7,8 @@ Robotiq grippers are controlled by writing commands to, and reading status from,
 The registers used to command the gripper are composed of 3 registers of 16 bits. Each register is split into 2 bytes (8 bits), for a total of 6 bytes.
 
 ![Gripper holding registers' bytes](./_static/command_registers.png)
+
+*Holding registers used to command the gripper, with the related C++ fields*
 
 The positionRequest, speed and force bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
 
@@ -18,7 +20,11 @@ The registers used to retrieve the status of the gripper are composed of 3 regis
 
 ![Gripper input registers' bytes](./_static/gripper_status_1.png)
 
+*Input registers where gripper status is saved, with related C++ command to retrieve it (1)*
+
 ![Gripper input registers' bytes](./_static/gripper_status_2.png)
+
+*Input registers where gripper status is saved, with related C++ command to retrieve it (2)*
 
 The positionRequestEcho, position and current bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
 
@@ -27,12 +33,60 @@ The gripperStatus and faultStatus bytes are composed of several bits that each h
 ## Gripper-related functions
 
 `Gripper`'s own methods — `setCommand()`, `getStatus()`, `getCommand()`,
-`connectionState()` — always return instantly: they only read or write
-an in-memory snapshot, never touch the bus themselves. A few operations
-need to poll and block instead, until some condition is met or a
-timeout elapses; those are deliberately kept as free functions taking a
-`Gripper&`, not methods, so it's obvious from the call site which calls
-can block and which can't.
+`connectionState()` — are used to set the command or read the status of the gripper.
+
+> **Warning:** calling `setCommand()` does not necessarily mean the command
+> will effectively be sent to the gripper.
+
+Those functions only read or write a local copy of the gripper's Modbus
+registers, owned by the gripper object. They do not send any Modbus RTU
+command to the gripper. The Modbus RTU communication is managed in the
+background by the gripper object, which runs a continuous communication
+thread with the gripper.
+
+As a consequence, if you write back-to-back `setCommand()` instructions, only the latest one will be taken into account.
+
+As an example, the code below sets an autorelease command and, right after that, a move command.
+
+```cpp
+// Build and set an autorelease command
+Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+command.action.set(Robotiq::ActionRequestBit::AutoRelease);
+gripper.setCommand(command);
+
+// Build and set a command to move the gripper to the position 100
+command = Robotiq::GripperCommand::defaults();
+command.action.set(Robotiq::ActionRequestBit::GoTo);
+command.positionRequest = 100;
+gripper.setCommand(command)
+```
+
+If the autorelease command is effectively sent to the gripper, the gripper will
+execute the autorelease, which has the effect of opening or closing the gripper
+and deactivating it. As a consequence, it is not possible to move the
+gripper after the autorelease.
+
+Looking at this code, you may think that the second command, asking for the gripper to move to position 100, will probably not be executed, but in fact it will be. The first `setCommand()` writes the autorelease command to the local copy of the Modbus register, and it is immediately followed by another `setCommand()` which rewrites the local copy before it is effectively sent to the gripper. The consequence is that the autorelease command is not sent to the gripper, and the move command is executed instead.
+
+To have the autorelease command effectively sent to the gripper, it is necessary to wait for the gripper to acknowledge reception of the command before the next `setCommand()`.
+
+```cpp
+// Build and set an autorelease command
+Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+command.action.set(Robotiq::ActionRequestBit::AutoRelease);
+gripper.setCommand(command);
+
+// Wait 
+Robotiq::waitFor([&]{return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress);},10s)
+
+// Build and set a command to move the gripper to the position 100
+command = Robotiq::GripperCommand::defaults();
+command.action.set(Robotiq::ActionRequestBit::GoTo);
+command.positionRequest = 100;
+gripper.setCommand(command)
+```
+
+The following section presents the wait function used in the code above.
 
 ### Waiting for a condition
 
@@ -45,6 +99,11 @@ bool settled = Robotiq::waitFor(
     [&]{ return gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving; },
     10s);
 ```
+
+The predicate is a C++ lambda — an anonymous inline function. `[&]` captures
+`gripper` (and any other locals it uses) by reference, so the body reads
+live state each time it's polled, and it must return a `bool`: `true` once
+the condition is met.
 
 It returns `true` if the condition held before the timeout, `false`
 otherwise — the condition is checked at least once, so an already-true
