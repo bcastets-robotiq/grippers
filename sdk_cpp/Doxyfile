@@ -7,9 +7,8 @@
 #     doxygen-html/index.html directly, no server needed. It won't look
 #     like the final site (different theme/chrome), but it's the fastest
 #     way to sanity-check comments, \ref/\see links, and grouping. See
-#     API_DOCUMENTATION.md and robotiq.github.io's contribute.mdx for the
-#     closer-fidelity check (Doxybook2) and the full-fidelity one (the
-#     site itself).
+#     robotiq.github.io's contribute.mdx for the full pipeline and the
+#     full-fidelity check (the site itself).
 #
 # Usage: doxygen Doxyfile   (run from sdk_cpp/)
 
