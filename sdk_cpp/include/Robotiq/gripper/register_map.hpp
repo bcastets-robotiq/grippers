@@ -38,6 +38,10 @@
 //! in a no-thread integration.
 namespace Robotiq::register_map {
 
+//! \addtogroup register_map
+//! @{
+//! \brief Constants for the Robotiq gripper's register map.
+
 //! \name Block layout
 //! How wide each block is, and how many of its leading bytes the manual
 //! tables — the rest is reserved (see the byte table above).
@@ -105,5 +109,5 @@ inline constexpr uint8_t kGripperFaultMask = 0x0F; //!< gFLT (low nibble)
 inline constexpr uint8_t kControllerFaultMask = 0xF0; //!< kFLT (high nibble)
 inline constexpr int kControllerFaultShift = 4; //!< shift applied to kFLT after masking
 //! \}
-
+//! @}
 } // namespace Robotiq::register_map
