@@ -21,7 +21,7 @@ namespace Robotiq {
 class Serial;
 
 //! \ingroup core_api
-//! \brief The Robotiq gripper API.
+//! \brief The Robotiq gripper Class.
 //!
 //! Construction opens the link, reads the gripper — failing like a dead
 //! serial link when it does not answer — and starts the exchange cycle;
@@ -65,16 +65,11 @@ class Serial;
 //!   parameter of a different function, even though both happen to be
 //!   named `logger` and both default to `nullptr` (meaning "use the
 //!   SDK's own default logger", not "no logging").
-//!
-//! See the SDK documentation's "How it works" page for the full connect →
-//! activate → command → status walkthrough, with the field-by-field
-//! reference for GripperCommand and GripperStatus, and "Embedded /
-//! bare-metal builds" for when the second constructor applies.
 class Gripper
 {
 public:
 #if GRIPPERS_BUILD_DEFAULT_SERIAL
-   //! \brief Open a gripper over the built-in serial transport.
+   //! \brief Create a gripper object and start communication over the built-in serial transport.
    //!
    //! Available only when `GRIPPERS_BUILD_DEFAULT_SERIAL` is `1`.
    //! This is normally enabled for hosted desktop builds and disabled for
@@ -91,7 +86,8 @@ public:
    explicit Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger = nullptr);
 #endif
 
-   //! \brief Open a gripper over a caller-supplied transport and platform.
+   //! \brief Create a gripper object and start communication over a 
+   //! caller-supplied transport and platform.
    //!
    //! Available regardless of `GRIPPERS_BUILD_DEFAULT_SERIAL`; use this
    //! overload when the built-in libserialport transport is disabled.
