@@ -233,7 +233,7 @@ Robotiq::Gripper gripper(config, logger);
 
 `Logger` is a one-method interface — `log(Level, message)` — with four severities:
 
-| `Logger::Level` | Meaning |
+| `Robotiq::Logger::Level` | Meaning |
 |---|---|
 | `Debug` | high-frequency, diagnostic detail |
 | `Info` | normal operational events |

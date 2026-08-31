@@ -12,7 +12,8 @@
   "foldersToGenerate": [
     "modules",
     "classes",
-    "files"
+    "files",
+    "namespaces",
   ],
   "formulaBlockEnd": "\\]",
   "formulaBlockStart": "\\[",
