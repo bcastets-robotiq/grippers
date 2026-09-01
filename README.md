@@ -20,6 +20,10 @@ as STM32 microcontrollers.
 
 <!-- /docs-site:exclude -->
 
+## Questions and bug reports
+Got to the following link to send your questiona and report bugs:
+[Robotiq/grippers/issues](https://github.com/Robotiq/grippers/issues)
+
 ## License
 
 BSD-3-Clause. Portions derived from PickNik Robotics'
