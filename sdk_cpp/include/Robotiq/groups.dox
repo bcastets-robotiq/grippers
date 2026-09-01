@@ -9,8 +9,8 @@
 //! \defgroup core_api Core API
 //! \brief Everything you need to control a Robotiq gripper.
 //!
-//! The gripper SDK is composed for the Gripper class associated with
-//! related tools to works with Gripper class objects.
+//! The gripper SDK is composed for the Gripper class  and free functions that
+//! operate on Gripper objects.
 //!
 //! \code
 //!               ConnectionConfig                Serial + Platform + Logger
