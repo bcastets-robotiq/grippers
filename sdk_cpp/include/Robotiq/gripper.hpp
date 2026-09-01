@@ -154,12 +154,7 @@ public:
    //! not create a new platform and does not provide direct serial access.
    //!
    //! \par Example
-   //! \code{.cpp}
-   //! bool settled = Robotiq::waitFor(
-   //!    [&] { return gripper.getStatus().positionRequestEcho == target; },
-   //!    gripper.platform(),
-   //!    std::chrono::seconds(1));
-   //! \endcode
+   //! \snippet snippets.cpp wait-with-platform
    [[nodiscard]] Platform& platform() const noexcept;
 
 private:
@@ -192,12 +187,7 @@ enum class ActivationResult
 //!         Timeout if completion never arrived in time.
 //!
 //! \par Example
-//! \code{.cpp}
-//! if(Robotiq::activate(gripper) == Robotiq::ActivationResult::FaultLatched)
-//! {
-//!    Robotiq::recoverFromFault(gripper);   // clears the fault; moves the fingers
-//! }
-//! \endcode
+//! \snippet move_gripper.cpp activation-recovery
 [[nodiscard]] ActivationResult activate(Gripper& gripper, std::chrono::milliseconds timeout = std::chrono::seconds(15));
 
 //! \ingroup activation

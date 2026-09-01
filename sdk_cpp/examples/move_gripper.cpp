@@ -151,6 +151,7 @@ int main(int argc, char* argv[])
    // not a Gripper member, because every Gripper member call returns
    // instantly — this one polls getStatus()/setCommand() in a loop instead.
    logger->log(Robotiq::Logger::Level::Info, "Activating...");
+   //! [activation-recovery]
    ActivationResult activation = Robotiq::activate(*gripper);
    if(activation == ActivationResult::FaultLatched)
    {
@@ -159,6 +160,7 @@ int main(int argc, char* argv[])
       logger->log(Robotiq::Logger::Level::Warn, "fault latched; recovering (the fingers will move)");
       activation = Robotiq::recoverFromFault(*gripper);
    }
+   //! [activation-recovery]
    if(activation != ActivationResult::Activated && activation != ActivationResult::AlreadyActive)
    {
       logger->log(Robotiq::Logger::Level::Error, "activation failed or timed out");

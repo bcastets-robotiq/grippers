@@ -16,13 +16,7 @@ namespace Robotiq {
 //! independently. Not thread-safe: one instance, one thread.
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::Throttle logThrottle(std::chrono::seconds(1));
-//! while(running)
-//! {
-//!    logThrottle.executeIfAllowed([&] { logger.log(Level::Debug, "still running"); });
-//! }
-//! \endcode
+//! \snippet snippets.cpp throttle-usage
 class Throttle
 {
 public:

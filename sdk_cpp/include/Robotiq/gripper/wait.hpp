@@ -20,12 +20,7 @@ namespace Robotiq {
 //! exist only on hosted runtimes.
 //!
 //! \par Example
-//! \code{.cpp}
-//! bool settled = Robotiq::waitFor(
-//!    [&] { return gripper.getStatus().positionRequestEcho == target; },
-//!    gripper.platform(),
-//!    std::chrono::seconds(1));
-//! \endcode
+//! \snippet snippets.cpp wait-with-platform
 
 //! \ingroup utilities
 //! \brief Poll \p predicate until it holds, or \p deadline passes.

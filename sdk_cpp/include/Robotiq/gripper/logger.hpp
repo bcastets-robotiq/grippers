@@ -21,20 +21,7 @@ namespace Robotiq {
 //! fully formatted message — formatting is the caller's concern.
 //!
 //! \par Example — a custom sink
-//! \code{.cpp}
-//! class UartLogger : public Robotiq::Logger
-//! {
-//! public:
-//!    void log(Level level, std::string_view message) override
-//!    {
-//!       if(level >= Level::Warn) { uart_write("!! "); }
-//!       uart_write(message);
-//!    }
-//! };
-//!
-//! auto logger = std::make_shared<UartLogger>();
-//! Robotiq::Gripper gripper(config, logger);
-//! \endcode
+//! \snippet snippets.cpp uart-logger
 class Logger
 {
 public:

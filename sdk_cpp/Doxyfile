@@ -19,9 +19,14 @@ OUTPUT_DIRECTORY       =
 
 INPUT                  = include
 RECURSIVE              = YES
-EXCLUDE                = 
+EXCLUDE                =
 EXCLUDE_PATTERNS       = */detail/*
-EXCLUDE_SYMBOLS        = 
+EXCLUDE_SYMBOLS        =
+
+# \snippet sources: every \code{.cpp} example lives here as real, compiled
+# code (see examples/README.md) instead of unverified inline text — a
+# renamed/typo'd tag is a WARN_AS_ERROR build failure, not a silent gap.
+EXAMPLE_PATH           = examples
 
 # Document the hosted API surface, including the ConnectionConfig constructor
 # guarded by GRIPPERS_BUILD_DEFAULT_SERIAL in the public header. This is a

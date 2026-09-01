@@ -47,16 +47,7 @@ enum class ObjectDetection : uint8_t
 //! ObjectDetection).
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::GripperStatus status = gripper.getStatus();
-//! bool activated = status.gripperStatus.activated();                     // gACT flag
-//! bool goTo = status.gripperStatus.goToEnabled();                        // gGTO flag
-//! if(status.gripperStatus.activationState() == Robotiq::ActivationState::Complete
-//!    && status.gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving)
-//! {
-//!    // motion has settled — status.position holds the final rPR (0..255)
-//! }
-//! \endcode
+//! \snippet snippets.cpp gripper-status-flags
 class GripperStatusFlags
 {
 public:
@@ -116,13 +107,7 @@ static_assert(std::is_standard_layout_v<GripperStatusFlags> && std::is_trivially
 //! integrations.
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::GripperStatus status = gripper.getStatus();
-//! if(status.gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving)
-//! {
-//!    // motion has settled — status.position holds the final rPR (0..255)
-//! }
-//! \endcode
+//! \snippet snippets.cpp motion-settled-example
 struct GripperStatus
 {
    GripperStatusFlags gripperStatus; //!< byte 0 — GRIPPER STATUS

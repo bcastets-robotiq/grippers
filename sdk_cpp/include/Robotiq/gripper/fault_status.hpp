@@ -112,13 +112,7 @@ enum class FaultSeverity : uint8_t
 //! optional Robotiq controller's fault (kFLT, high nibble).
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::FaultStatus fault = gripper.getStatus().faultStatus;
-//! if(Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
-//! {
-//!    Robotiq::recoverFromFault(gripper);
-//! }
-//! \endcode
+//! \snippet snippets.cpp fault-severity-check
 class FaultStatus
 {
 public:

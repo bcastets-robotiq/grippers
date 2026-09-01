@@ -22,13 +22,7 @@ namespace Robotiq {
 //!         indices (0 = least significant bit) into the underlying value.
 //!
 //! \par Example
-//! \code{.cpp}
-//! enum class Flag : uint8_t { A = 0, B = 1 };
-//! Robotiq::NamedBitArray<Flag> bits;
-//! bits.set(Flag::A);
-//! bits.set(Flag::B, false);
-//! bool a = bits.get(Flag::A);   // true
-//! \endcode
+//! \snippet snippets.cpp named-bit-array
 template <class BitEnum>
 class NamedBitArray
 {

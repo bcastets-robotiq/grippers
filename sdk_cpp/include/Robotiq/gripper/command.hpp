@@ -40,13 +40,7 @@ enum class ActionRequestBit : uint8_t
 //! it or the state comes from a variable.
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
-//! command.action.set(Robotiq::ActionRequestBit::GoTo);                  // start moving (same as set(GoTo, true))
-//! command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);    // ...but not an emergency release
-//! bool goTo = command.action.get(Robotiq::ActionRequestBit::GoTo);      // true
-//! gripper.setCommand(command);
-//! \endcode
+//! \snippet snippets.cpp action-request-bits
 using ActionRequest = NamedBitArray<ActionRequestBit>;
 
 //! \ingroup command
@@ -58,13 +52,8 @@ using ActionRequest = NamedBitArray<ActionRequestBit>;
 //! raw block for the transport and for no-thread integrations.
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
-//! command.positionRequest = 128;   // halfway closed
-//! command.speed = 200;
-//! command.action.set(Robotiq::ActionRequestBit::GoTo, true);
-//! gripper.setCommand(command);
-//! \endcode
+//! \snippet quick_start.cpp qs-create-command
+//! \snippet quick_start.cpp qs-send-command
 struct GripperCommand
 {
    ActionRequest action{}; //!< byte 0 — ACTION REQUEST

@@ -61,12 +61,7 @@ inline constexpr std::size_t kStatusDocumentedBytes = 6; //!< leading status-blo
 //! constants directly only when you have a raw status byte and no
 //! GripperStatusFlags wrapping it, e.g. a no-thread integration decoding
 //! bytes straight off the wire:
-//! \code{.cpp}
-//! uint8_t rawStatusByte = /* read from the wire */;
-//! uint8_t gSTA = (rawStatusByte & Robotiq::register_map::kActivationStateMask)
-//!                >> Robotiq::register_map::kActivationStateShift;
-//! bool activated = (rawStatusByte & Robotiq::register_map::kActivationStatusMask) != 0;
-//! \endcode
+//! \snippet snippets.cpp decode-raw-status-byte
 //! \{
 inline constexpr uint8_t kActivationStatusMask = 0x01; //!< gACT
 inline constexpr uint8_t kGoToEchoMask = 0x08; //!< gGTO

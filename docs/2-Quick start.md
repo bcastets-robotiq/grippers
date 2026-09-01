@@ -12,36 +12,35 @@ Refer to API documentation to get more details.
 
 ## Import dependencies
 
+<!-- snippet: quick_start.cpp qs-includes -->
 ```cpp
 // Import gripper C++ driver
-#include <Robotiq/gripper.hpp>
+#include <Robotiq/gripper.hpp> // Gripper, GripperCommand/Status, activate(), recoverFromFault()
 
 // Import utilities libraries
 #include <iostream> // Library use to write message in the terminal.
-#include <chrono>   // duration literals 1s, 200ms, ...
-using namespace std::chrono_literals; // enables the 1s / 200ms / 5s literals
+#include <chrono>   // duration literals for the waitFor() timeouts below (1s, 200ms, ...)
+using namespace std::chrono_literals; // enables the 1s / 200ms / 5s literals below
 ```
 
 ## Write the main program
 
-```cpp
-int main(){
-    //The code we are going to write from now on
-}
-```
+Everything from here on goes inside `int main() { ... }` in quick_start.cpp.
 
 ### Create a connection configuration
 Create a ConnectionConfig object and specify which port the gripper is connected to.
 This example supposes that the gripper is connected to COM4 of a Windows PC. Adjust the code to fit the port you are using to connect the gripper.
 
+<!-- snippet: quick_start.cpp qs-config -->
 ```cpp
 Robotiq::ConnectionConfig config;
-config.serial.port = "COM4"; //or "/dev/ttyUSB0" for linux
+config.serial.port = "COM4"; //or "/dev/ttyUSB0" for linux. Adjust the port name according to your system.
 ```
 
 ### Create a gripper object
 Create a gripper object using the previously created connection configuration.
 
+<!-- snippet: quick_start.cpp qs-create-gripper -->
 ```cpp
 Robotiq::Gripper gripper = Robotiq::Gripper(config);
 ```
@@ -51,6 +50,7 @@ Gripper activation is the first action to perform before being able to use the g
 
 The activate function is marked `[[nodiscard]]`, which means the result must be saved into a variable, it cannot be discarded.
 
+<!-- snippet: quick_start.cpp qs-activate -->
 ```cpp
 Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
 ```
@@ -68,6 +68,7 @@ The command is initially built from a default command.
 The GoTo bit of the action register has to be set to 1 so that the gripper moves to the position written in its position register.
 The desired position, speed and force have to be defined.
 
+<!-- snippet: quick_start.cpp qs-create-command -->
 ```cpp
 Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::GoTo);
@@ -79,6 +80,7 @@ command.force = 255;
 ### Send the command
 Once the command is prepared we can send it to the gripper using the setCommand function.
 
+<!-- snippet: quick_start.cpp qs-send-command -->
 ```cpp
 gripper.setCommand(command);
 ```
@@ -91,22 +93,24 @@ The wait function is marked `[[nodiscard]]`, which means the result must be save
 First we have to wait for the gripper to acknowledge the reception of the
 command. Then we can wait for the command to complete.
 
+<!-- snippet: quick_start.cpp qs-wait -->
 ```cpp
-// Wait for the gripper to acknowledge the reception of the command
+// 6- Wait for the gripper to echo
 bool positionRequestEchoed = Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
-// Wait for the gripper to complete the move
-bool settled = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+// 7- Wait for the action to complete
+bool motionCompleted = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
 ```
 
 ### Retrieve gripper status
 
 The status of the gripper can be retrieved with the getStatus function. Here is an example where we retrieve and print the current position of the gripper.
 
+<!-- snippet: quick_start.cpp qs-status -->
 ```cpp
-    // Retrieve gripper current position
-    uint8_t currentPosition = gripper.getStatus().position;
+// 8- retrieve status
+uint8_t currentPosition = gripper.getStatus().position;
 
-    // Print gripper current position in terminal
-    std::cout << "Current position : " << static_cast<int>(currentPosition) << std::endl;
+// Print retrieved status
+std::cout << "Current position : " << static_cast<int>(currentPosition) << std::endl;
 ```

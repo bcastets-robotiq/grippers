@@ -26,13 +26,7 @@ inline constexpr uint8_t kDefaultModbusSlaveAddress = 0x09;
 //! ROS 2 wrapper fills it from hardware parameters, a CLI from argv.
 //!
 //! \par Example
-//! \code{.cpp}
-//! Robotiq::ConnectionConfig config;
-//! config.modbusSlaveAddress = 0x09;
-//! config.serial.port = "/dev/ttyUSB0";
-//! config.serial.baudrate = 115200;
-//! config.connectionFrequency = 100.0;   // Hz
-//! \endcode
+//! \snippet snippets.cpp configure-connection
 struct ConnectionConfig
 {
    //! The serial port and its link parameters; see SerialConfig.

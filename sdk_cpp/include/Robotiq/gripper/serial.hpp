@@ -30,26 +30,7 @@ namespace Robotiq {
 //! ports/threadx/threadx_platform.hpp.
 //!
 //! \par Example — a minimal loopback transport for tests
-//! \code{.cpp}
-//! class LoopbackSerial : public Robotiq::Serial
-//! {
-//! public:
-//!    void open() override { _open = true; }
-//!    bool isOpen() const override { return _open; }
-//!    void close() override { _open = false; }
-//!    std::vector<uint8_t> read(size_t size, std::chrono::milliseconds) override
-//!    {
-//!       return _rx.take(size);   // however the test feeds bytes in
-//!    }
-//!    void write(const std::vector<uint8_t>& data) override { _rx.feed(data); }
-//!    std::chrono::milliseconds getTimeout() const override { return _timeout; }
-//!
-//! private:
-//!    bool _open = false;
-//!    std::chrono::milliseconds _timeout{500};
-//!    RingBuffer _rx;
-//! };
-//! \endcode
+//! \snippet snippets.cpp loopback-serial
 class Serial
 {
 public:

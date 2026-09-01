@@ -40,10 +40,7 @@ namespace Robotiq {
 //!        connectionFrequency is negative.
 //!
 //! \par Example
-//! \code{.cpp}
-//! auto gripper = Robotiq::makeFakeGripper();   // no hardware needed
-//! Robotiq::activate(*gripper);
-//! \endcode
+//! \snippet snippets.cpp make-fake-gripper
 [[nodiscard]] std::unique_ptr<Gripper> makeFakeGripper(const ConnectionConfig& config = {},
                                                        std::shared_ptr<Logger> logger = nullptr);
 } // namespace Robotiq
