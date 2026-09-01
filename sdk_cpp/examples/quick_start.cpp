@@ -55,8 +55,6 @@ int main() {
     std::cout << "Current position : " << static_cast<int>(currentPosition) << std::endl;
     //! [qs-status]
 
-    command.action.set(Robotiq::ActionRequestBit::Activate,false);
-
     // End of the program
     return 0;
 }
