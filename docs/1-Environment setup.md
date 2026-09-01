@@ -154,8 +154,10 @@ own application expects (e.g. the serial port):
    in the status bar, or open a terminal and run the built `.exe`
    directly. Either way, if your program takes arguments (e.g. a
    serial port like `COM3`), set them once in `cmake.debugConfig.args`
-   in your project's `.vscode/settings.json` and the status bar's
-   Run/Debug buttons will pass them automatically.
+   in your own `.vscode/settings.json` (`.vscode/` is gitignored except
+   for `extensions.json`, so this file is yours alone — create it if it
+   doesn't exist yet) and the status bar's Run/Debug buttons will pass
+   them automatically.
 
 You can develop and test without a physical gripper at all: call
 [`makeFakeGripper()`](../sdk_cpp/include/Robotiq/gripper/fake/gripper_factory.hpp)
