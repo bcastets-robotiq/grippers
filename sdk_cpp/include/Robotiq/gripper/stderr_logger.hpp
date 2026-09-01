@@ -32,9 +32,10 @@ namespace Robotiq {
 class StderrLogger : public Logger
 {
 public:
-   
+   //! \param name Optional tag prepended to every line this instance
+   //!        writes; empty by default (no tag).
    explicit StderrLogger(std::string name = {});
-   
+
    //! \copydoc Logger::log
    void log(Level level, std::string_view message) override;
 
