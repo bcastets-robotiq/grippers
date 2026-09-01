@@ -4,7 +4,7 @@ At the wire level, Robotiq grippers are controlled by writing commands to, and r
 
 Check the gripper user manual on the Robotiq support website if you want to learn more about the gripper's Modbus RTU communication.
 
-## Command (Holding registers 1000 - 1002)
+## Command
 
 The registers used to command the gripper are composed of 3 registers of 16 bits. Each register is split into 2 bytes (8 bits), for a total of 6 bytes.
 
@@ -51,7 +51,7 @@ command.speed = 255;
 command.force = 255;
 ```
 
-## Status (Input registers 2000 - 2002)
+## Status
 
 The registers used to retrieve the status of the gripper are composed of 3 registers of 16 bits. Each register is split into 2 bytes (8 bits), for a total of 6 bytes.
 
