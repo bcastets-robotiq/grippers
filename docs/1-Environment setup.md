@@ -39,7 +39,7 @@ differently — e.g. on a target with no hosted C++ runtime.
 
 The environment to compile the C++ code of the driver differs depending on your operating system.
 
-| Platform | libserialport |
+| Platform | Build environment |
 |----------|----------------|
 | Ubuntu/Debian | native terminal |
 | macOS | native terminal |
