@@ -36,35 +36,6 @@ class Serial;
 //! whole commands — no per-field accessors, deliberately: every
 //! transmitted frame is a command the application composed, and two
 //! fields never come from different exchange cycles.
-//!
-//! Blocking procedures — activate(), recoverFromFault() — are free
-//! functions, not members, even though they're specifically meant to be
-//! used with this class: every *member* of Gripper is guaranteed to
-//! return instantly, and keeping the blocking procedures outside the
-//! class is what signals the difference. They're composed entirely out
-//! of the same public accessors (getStatus(), setCommand()) your own
-//! code has, polling in a loop — which also means they have no way to
-//! hold the internal lock those accessors use for longer than an
-//! instant, the way an equivalent member function easily could.
-//!
-//! \par Two constructors, for two different situations
-//! These are two independent overloads, not one constructor with more
-//! optional parameters — the compiler picks between them at compile time,
-//! from the number and types of arguments you pass. The
-//! `ConnectionConfig`-based overload is compiled only when
-//! `GRIPPERS_BUILD_DEFAULT_SERIAL` is `1`; the `Serial`/`Platform`-based
-//! overload is always available and is the path to use when that macro is
-//! `0`:
-//! - The `ConnectionConfig`-based constructor below is the common case:
-//!   a desktop app talking to a gripper over a real serial port. Its
-//!   `logger` is that constructor's *2nd* parameter.
-//! - The `Serial`/`Platform`-based constructor further below is for
-//!   everything else that isn't that: a custom transport, a unit test
-//!   double, or a freestanding/RTOS target with no libserialport. Its
-//!   `logger` is that constructor's *5th* parameter — a different
-//!   parameter of a different function, even though both happen to be
-//!   named `logger` and both default to `nullptr` (meaning "use the
-//!   SDK's own default logger", not "no logging").
 class Gripper
 {
 public:
