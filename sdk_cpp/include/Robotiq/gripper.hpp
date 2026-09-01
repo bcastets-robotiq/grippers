@@ -140,21 +140,9 @@ public:
 
    //! \brief Return the runtime Platform used by this gripper.
    //!
-   //! The platform supplies the runtime services needed by the background
-   //! exchange thread: spawning a thread, creating its lock, and yielding
-   //! while waiting. It is selected when the Gripper is constructed —
-   //! `makeDefaultPlatform()` for a hosted application, or a caller-supplied
-   //! RTOS implementation for an embedded target.
-   //!
-   //! Use this accessor when code outside Gripper needs to wait or sleep in
-   //! the same runtime environment. For example, pass it to the Platform
-   //! overload of `waitFor()` when polling a status condition. The returned
-   //! reference is owned by Gripper and remains valid until that Gripper is
-   //! destroyed; callers must not delete or replace it. This function does
-   //! not create a new platform and does not provide direct serial access.
-   //!
-   //! \par Example
-   //! \snippet snippets.cpp wait-with-platform
+   //! For most applications the function below should never be used. In some
+   //! cases, such as embedded applications, it is needed for platform-specific
+   //! versions of free functions such as waitFor and waitUntil.
    [[nodiscard]] Platform& platform() const noexcept;
 
 private:
