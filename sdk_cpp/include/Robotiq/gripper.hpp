@@ -86,7 +86,7 @@ public:
    explicit Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger = nullptr);
 #endif
 
-   //! \brief Create a gripper object and start communication over a 
+   //! \brief Create a gripper object and start communication over a
    //! caller-supplied transport and platform.
    //!
    //! Available regardless of `GRIPPERS_BUILD_DEFAULT_SERIAL`; use this
