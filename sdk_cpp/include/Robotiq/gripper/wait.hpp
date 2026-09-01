@@ -38,8 +38,6 @@ namespace Robotiq {
 //! \param deadline The time point past which waiting gives up.
 //! \param pollPeriod How long to sleep between polls.
 //! \return true if \p predicate held before \p deadline; false on timeout.
-//! \note [[nodiscard]]: discarding the result silently misses whether the
-//!       wait timed out.
 template <typename Predicate>
 [[nodiscard]] bool waitUntil(Predicate predicate,
                              Platform& platform,
@@ -68,8 +66,6 @@ template <typename Predicate>
 //! \param timeout How long to wait, starting now.
 //! \param pollPeriod How long to sleep between polls.
 //! \return true if \p predicate held within \p timeout; false on timeout.
-//! \note [[nodiscard]]: discarding the result silently misses whether the
-//!       wait timed out.
 template <typename Predicate>
 [[nodiscard]] bool waitFor(Predicate predicate,
                            Platform& platform,
@@ -83,8 +79,6 @@ template <typename Predicate>
 //! \ingroup utilities
 //! \overload
 //! Sleeps on the default (std::thread-backed) platform. Hosted-only.
-//! \note [[nodiscard]]: discarding the result silently misses whether the
-//!       wait timed out.
 template <typename Predicate>
 [[nodiscard]] bool waitUntil(Predicate predicate,
                              std::chrono::steady_clock::time_point deadline,
@@ -96,8 +90,6 @@ template <typename Predicate>
 //! \ingroup utilities
 //! \overload
 //! Sleeps on the default (std::thread-backed) platform. Hosted-only.
-//! \note [[nodiscard]]: discarding the result silently misses whether the
-//!       wait timed out.
 template <typename Predicate>
 [[nodiscard]] bool waitFor(Predicate predicate,
                            std::chrono::milliseconds timeout,

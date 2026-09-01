@@ -190,9 +190,6 @@ enum class ActivationResult
 //! \return Activated or AlreadyActive on success; FaultLatched if a major
 //!         fault blocks activation — call recoverFromFault() instead;
 //!         Timeout if completion never arrived in time.
-//! \note [[nodiscard]]: discarding the result silently misses FaultLatched
-//!       and Timeout — the caller would have no way to tell success from
-//!       a fault or a timed-out handshake.
 //!
 //! \par Example
 //! \code{.cpp}
@@ -213,8 +210,6 @@ enum class ActivationResult
 //! \param gripper The gripper to recover.
 //! \param timeout How long to wait for the handshake to complete.
 //! \return Activated on success; Timeout if completion never arrived in time.
-//! \note [[nodiscard]]: discarding the result silently misses Timeout — the
-//!       caller would have no way to tell the handshake actually completed.
 [[nodiscard]] ActivationResult recoverFromFault(Gripper& gripper,
                                                 std::chrono::milliseconds timeout = std::chrono::seconds(15));
 } // namespace Robotiq
