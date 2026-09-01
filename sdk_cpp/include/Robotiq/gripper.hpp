@@ -40,31 +40,20 @@ class Gripper
 {
 public:
 #if GRIPPERS_BUILD_DEFAULT_SERIAL
-   //! \brief Create a gripper object and start communication over the built-in serial transport.
+   //! \brief The common-case constructor: create a gripper object and
+   //!  start communication over the built-in serial transport.
    //!
-   //! Available only when `GRIPPERS_BUILD_DEFAULT_SERIAL` is `1`.
-   //! This is normally enabled for hosted desktop builds and disabled for
-   //! freestanding or RTOS builds.
-   //! The common-case constructor: a real gripper over a real serial port.
-   //! \param config Serial link and Modbus addressing; see ConnectionConfig.
+   //! \param config see ConnectionConfig.
    //! \param logger Log sink; pass null to use the default stderr logger.
    //! \throw SerialIOException when the port cannot be opened/configured.
    //! \throw DriverException when no gripper answers the initial read, or
    //!        when config.connectionFrequency is invalid.
-   //!
-   //! For custom transports, test doubles, and freestanding/RTOS targets,
-   //! use the other constructor below instead.
    explicit Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger = nullptr);
 #endif
 
    //! \brief Create a gripper object and start communication over a
    //! caller-supplied transport and platform.
    //!
-   //! Available regardless of `GRIPPERS_BUILD_DEFAULT_SERIAL`; use this
-   //! overload when the built-in libserialport transport is disabled.
-   //! For custom serial implementations, unit tests, and RTOS targets. The
-   //! exchange runs on the given platform — makeDefaultPlatform() on a
-   //! hosted runtime, or your RTOS port (see Platform and ports/).
    //! \param serial The transport to exchange over; must not be null.
    //! \param slaveAddress The gripper's Modbus slave address.
    //! \param exchangePeriod Period of the background exchange cycle.
