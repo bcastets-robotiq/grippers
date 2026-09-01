@@ -1,6 +1,6 @@
 # How it works
 
-Robotiq grippers are controlled by writing commands to, and reading status from, their memory. The memory read and write is done using Modbus RTU.
+At the wire level, Robotiq grippers are controlled by writing commands to, and reading status from, their memory over Modbus RTU. With this SDK, though, you never issue Modbus RTU requests yourself: you call `setCommand()` and `getStatus()`, and the `Gripper` object handles the Modbus RTU exchange with the hardware in the background.
 
 ## Command (Holding registers 1000 - 1002)
 
