@@ -19,13 +19,16 @@ namespace Robotiq {
 
 //! \ingroup logging
 //! \brief Default Logger implementation that writes to stderr.
-//!
 //! Hosted-only: it needs \<iostream\> and a wall clock, neither of which a
 //! freestanding target has — provide an application Logger (e.g. a UART
 //! sink) there instead.
 //!
-//! Thread-safe: a single std::mutex serializes writes so interleaved log
-//! lines from concurrent threads aren't garbled.
+//! Thread-safe: writes are serialized across all instances, so they
+//! share the stream without garbling lines. The optional name tags
+//! every line: inject one instance into the SDK and keep another for
+//! application messages to tell them apart (a real integration gets the
+//! same separation from its injected adapter, e.g. a named rclcpp
+//! logger).
 class StderrLogger : public Logger
 {
 public:
