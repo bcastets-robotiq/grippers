@@ -2,33 +2,111 @@
 
 At the wire level, Robotiq grippers are controlled by writing commands to, and reading status from, their memory over Modbus RTU. With this SDK, though, you never issue Modbus RTU requests yourself: you call `setCommand()` and `getStatus()`, and the `Gripper` object handles the Modbus RTU exchange with the hardware in the background.
 
+Check the gripper user manual on the Robotiq support website if you want to learn more about the gripper's Modbus RTU communication.
+
 ## Command (Holding registers 1000 - 1002)
 
 The registers used to command the gripper are composed of 3 registers of 16 bits. Each register is split into 2 bytes (8 bits), for a total of 6 bytes.
 
-![Gripper holding registers' bytes](./_static/command_registers.png)
-
-*Holding registers used to command the gripper, with the related C++ fields*
+|Register| Byte | Name | Content |
+|---|---|---|---|
+|1000| 0 | ACTION REQUEST | Packed Byte |
+|1000| 1 | Reserved | - |
+|1001| 2 | Reserved | - |
+|1001| 3 | POSITION REQUEST (rPR) | 0-255 value |
+|1002| 4 | SPEED (rSP) | 0-255 value |
+|1002| 5 | FORCE (rFR) | 0-255 value |
 
 The positionRequest, speed and force bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
 
-The action byte is composed of several bits, each with a dedicated function. The bits that make up the action byte are set using the `set` function. Bits are identified using the enum `Robotiq::ActionRequestBit`.
+The action request byte (byte 0) is composed of several bits, each with a dedicated function:
+
+| Bits | 7-6 | 5 | 4 | 3 | 2-1 | 0 |
+|---|---|---|---|---|---|---|
+| Field | reserved | rARD | rATR | rGTO | reserved | rACT |
+
+This SDK translates this into a command with equivalent fields.
+
+Packed bytes are built using the `set` function and a dedicated enum.
+
+<!-- snippet: snippets.cpp command-action-bits -->
+```cpp
+// Command object use to interact with gripper holding registers
+Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+
+// Command building blocks
+// ACTION - rACT
+command.action.set(Robotiq::ActionRequestBit::Activate, true);
+// ACTION - rGTO
+command.action.set(Robotiq::ActionRequestBit::GoTo, true);
+// ACTION - rATR
+command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);
+// ACTION - rARD
+command.action.set(Robotiq::ActionRequestBit::AutoReleaseOpenDirection, true);
+// POSITION REQUEST - rPR
+command.positionRequest = 100;
+// SPEED - rSP
+command.speed = 255;
+// FORCE - rFR
+command.force = 255;
+```
 
 ## Status (Input registers 2000 - 2002)
 
 The registers used to retrieve the status of the gripper are composed of 3 registers of 16 bits. Each register is split into 2 bytes (8 bits), for a total of 6 bytes.
 
-![Gripper input registers' bytes](./_static/gripper_status_1.png)
-
-*Input registers where gripper status is saved, with related C++ command to retrieve it (1)*
-
-![Gripper input registers' bytes](./_static/gripper_status_2.png)
-
-*Input registers where gripper status is saved, with related C++ command to retrieve it (2)*
+|Register| Byte | Name | Content |
+|---|---|---|---|
+|2000| 0 | GRIPPER STATUS | Packed Byte |
+|2000| 1 | Reserved | - |
+|2001| 2 | FAULT STATUS | Packed Byte |
+|2001| 3 | POS REQUEST ECHO (gPR) | 0-255 value |
+|2002| 4 | POSITION (gPO) | 0-255 value |
+|2002| 5 | CURRENT (gCU) | 0-255 value |
 
 The positionRequestEcho, position and current bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
 
-The gripperStatus and faultStatus bytes are composed of several bits that each hold specific information about the gripper status. Some information, like gGTO, is coded on 1 bit, while others, like gOBJ or gFLT, are coded on several bits. Information coded on 1 bit is boolean, while multi-bit information decodes to an enum.
+Grippers status and fault status are composed of several bits, each hosted a specific information.
+
+*GRIPPER STATUS BYTE (0)*
+
+| Bits | 7-6 | 5-4 | 3 | 2-1 | 0 |
+|---|---|---|---|---|---|
+| Field | gOBJ | gSTA | gGTO | reserved | gACT |
+
+*FAULT STATUS BYTE (2)*
+
+| Bits | 7-4 | 3-0 |
+|---|---|---|
+| Field | kFLT | gFLT |
+
+This SDK translates this into a status object with equivalent fields, decoded using a dedicated enum.
+
+<!-- snippet: snippets.cpp status-gripper-status-fields -->
+```cpp
+// Status object retrieved from gripper input registers
+Robotiq::GripperStatus status = gripper.getStatus();
+
+// Status building blocks
+// GRIPPER STATUS - gOBJ
+Robotiq::ObjectDetection gOBJ = status.gripperStatus.objectDetection();
+// GRIPPER STATUS - gSTA
+Robotiq::ActivationState gSTA = status.gripperStatus.activationState();
+// GRIPPER STATUS - gGTO
+bool gGTO = status.gripperStatus.goToEnabled();
+// GRIPPER STATUS - gACT
+bool gACT = status.gripperStatus.activated();
+// FAULT STATUS - kFLT
+Robotiq::ControllerFault kFLT = status.faultStatus.controllerFault();
+// FAULT STATUS - gFLT
+Robotiq::GripperFault gFLT = status.faultStatus.gripperFault();
+// POS REQUEST ECHO - gPR
+uint8_t gPR = status.positionRequestEcho;
+// POSITION - gPO
+uint8_t gPO = status.position;
+// CURRENT - gCU
+uint8_t gCU = status.current;
+```
 
 ## Gripper-related functions
 

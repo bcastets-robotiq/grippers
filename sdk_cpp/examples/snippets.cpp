@@ -38,6 +38,58 @@ void configureConnection()
 }
 //! [configure-connection]
 
+void commandActionBits()
+{
+   //! [command-action-bits]
+   // Command object use to interact with gripper holding registers
+   Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+
+   // Command building blocks
+   // ACTION - rACT
+   command.action.set(Robotiq::ActionRequestBit::Activate, true);
+   // ACTION - rGTO
+   command.action.set(Robotiq::ActionRequestBit::GoTo, true);
+   // ACTION - rATR
+   command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);
+   // ACTION - rARD
+   command.action.set(Robotiq::ActionRequestBit::AutoReleaseOpenDirection, true);
+   // POSITION REQUEST - rPR
+   command.positionRequest = 100;
+   // SPEED - rSP
+   command.speed = 255;
+   // FORCE - rFR
+   command.force = 255;
+   //! [command-action-bits]
+}
+
+void statusGripperStatusFields(Robotiq::Gripper& gripper)
+{
+   //! [status-gripper-status-fields]
+   // Status object retrieved from gripper input registers
+   Robotiq::GripperStatus status = gripper.getStatus();
+
+   // Status building blocks
+   // GRIPPER STATUS - gOBJ
+   Robotiq::ObjectDetection gOBJ = status.gripperStatus.objectDetection();
+   // GRIPPER STATUS - gSTA
+   Robotiq::ActivationState gSTA = status.gripperStatus.activationState();
+   // GRIPPER STATUS - gGTO
+   bool gGTO = status.gripperStatus.goToEnabled();
+   // GRIPPER STATUS - gACT
+   bool gACT = status.gripperStatus.activated();
+   // FAULT STATUS - kFLT
+   Robotiq::ControllerFault kFLT = status.faultStatus.controllerFault();
+   // FAULT STATUS - gFLT
+   Robotiq::GripperFault gFLT = status.faultStatus.gripperFault();
+   // POS REQUEST ECHO - gPR
+   uint8_t gPR = status.positionRequestEcho;
+   // POSITION - gPO
+   uint8_t gPO = status.position;
+   // CURRENT - gCU
+   uint8_t gCU = status.current;
+   //! [status-gripper-status-fields]
+}
+
 //! [action-request-bits]
 void actionRequestBits(Robotiq::Gripper& gripper)
 {
