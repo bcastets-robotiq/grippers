@@ -120,9 +120,11 @@ int main(int argc, char* argv[])
       }
    }
 
-   // The SDK logs through an injectable sink; the example shares it
-   // for its own narration so all lines land on one ordered stream.
-   auto logger = std::make_shared<Robotiq::StderrLogger>();
+   // The SDK logs through an injectable sink; naming the instances
+   // tells library and application lines apart in the shared stream.
+   // (A real integration gets the same separation from its injected
+   // adapter, e.g. a named rclcpp logger.)
+   auto logger = std::make_shared<Robotiq::StderrLogger>("example");
 
    // Constructing Gripper opens the serial port, does one initial read to
    // confirm a gripper answers, and starts the background exchange thread
@@ -132,7 +134,7 @@ int main(int argc, char* argv[])
    std::unique_ptr<Gripper> gripper;
    try
    {
-      gripper = std::make_unique<Gripper>(config, logger); // opens and starts exchanging
+      gripper = std::make_unique<Gripper>(config, std::make_shared<Robotiq::StderrLogger>("robotiq")); // opens and starts exchanging
    }
    catch(const std::exception& ex)
    {

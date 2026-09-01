@@ -24,9 +24,21 @@ as STM32 microcontrollers.
 Got to the following link to send your questiona and report bugs:
 [Robotiq/grippers/issues](https://github.com/Robotiq/grippers/issues)
 
+## Versioning
+
+[Semantic versioning](https://semver.org) from 1.0.0 on: patch releases fix
+bugs, minor releases add API, and a breaking change to the documented API takes
+a major release. The documented API is what this README and the public headers
+describe — `Gripper`, the command/status blocks and the register map,
+`ConnectionConfig`, `Serial`, `Platform`, `Logger`, and
+`detail::GripperModbusClient` for the no-thread path. Anything under
+`Robotiq/detail/` that is not described here is internal and may change in any
+release.
+
 ## License
 
-BSD-3-Clause. Portions derived from PickNik Robotics'
+BSD-3-Clause. Robotiq develops and maintains this SDK; parts of it started from
+PickNik Robotics'
 [ros2_robotiq_gripper](https://github.com/PickNikRobotics/ros2_robotiq_gripper)
-driver (BSD-3-Clause); original copyright notices are preserved in the
-affected files and full history is preserved in git.
+driver (BSD-3-Clause), whose original copyright notices are preserved in the
+affected files, with the full history preserved in git.

@@ -10,7 +10,7 @@
 #error "StderrLogger is hosted-only: on a freestanding target, implement a Logger over your own sink instead."
 #endif
 
-#include <mutex>
+#include <string>
 #include <string_view>
 
 #include <Robotiq/gripper/logger.hpp>
@@ -32,11 +32,14 @@ namespace Robotiq {
 class StderrLogger : public Logger
 {
 public:
+   
+   explicit StderrLogger(std::string name = {});
+   
    //! \copydoc Logger::log
    void log(Level level, std::string_view message) override;
 
 private:
-   std::mutex _mutex;
+   std::string _name;
 };
 
 } // namespace Robotiq
