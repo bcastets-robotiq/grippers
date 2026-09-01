@@ -59,8 +59,6 @@ enum class FaultSeverity : uint8_t
 //! \param fault The gripper's own fault code, from FaultStatus::gripperFault().
 //! \return The fault's severity. Unrecognized codes report Major so an
 //!         unknown fault is never mistaken for harmless.
-//! \note [[nodiscard]]: a pure classification with no side effects; calling
-//!       it only to discard the result is always a mistake.
 [[nodiscard]] constexpr FaultSeverity severity(GripperFault fault)
 {
    switch(fault)
@@ -89,8 +87,6 @@ enum class FaultSeverity : uint8_t
 //! \param fault The controller's fault code, from FaultStatus::controllerFault().
 //! \return The fault's severity. Unrecognized codes report Major so an
 //!         unknown fault is never mistaken for harmless.
-//! \note [[nodiscard]]: a pure classification with no side effects; calling
-//!       it only to discard the result is always a mistake.
 [[nodiscard]] constexpr FaultSeverity severity(ControllerFault fault)
 {
    switch(fault)
@@ -131,8 +127,6 @@ public:
    //! For simulators and for exercising fault handling without hardware.
    //! \param bits The raw FAULT STATUS byte.
    //! \return A FaultStatus wrapping \p bits.
-   //! \note [[nodiscard]]: a pure factory with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] static constexpr FaultStatus fromRaw(uint8_t bits)
    {
       FaultStatus status;
@@ -141,16 +135,12 @@ public:
    }
 
    //! \return gFLT — the gripper's own fault code.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] GripperFault gripperFault() const
    {
       return static_cast<GripperFault>(_bits & register_map::kGripperFaultMask);
    }
 
    //! \return kFLT — the optional Robotiq controller's fault code.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] ControllerFault controllerFault() const
    {
       return static_cast<ControllerFault>((_bits & register_map::kControllerFaultMask)
@@ -158,17 +148,11 @@ public:
    }
 
    //! \return The raw FAULT STATUS byte, unpacked.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] uint8_t raw() const { return _bits; }
 
    //! \return true if both fault bytes are identical.
-   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] bool operator==(FaultStatus other) const { return _bits == other._bits; }
    //! \return true if the fault bytes differ.
-   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] bool operator!=(FaultStatus other) const { return _bits != other._bits; }
 
 private:

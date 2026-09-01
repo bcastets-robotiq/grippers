@@ -24,8 +24,6 @@ namespace Robotiq::detail {
 // is also nothing to gain: RegisterCount is a compile-time constant, so
 // these loops fully unroll.
 
-//! \note [[nodiscard]]: a pure conversion with no side effects; calling it
-//!       only to discard the result is always a mistake.
 template <std::size_t RegisterCount>
 [[nodiscard]] std::array<uint16_t, RegisterCount> registersFromBytes(const uint8_t* block)
 {

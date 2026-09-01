@@ -43,8 +43,6 @@ public:
    DriverException& operator=(const DriverException&) = delete;
 
    //! \return The formatted "DriverException: <description>." message.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] const char* what() const throw() override { return _what.c_str(); }
 };
 } // namespace Robotiq

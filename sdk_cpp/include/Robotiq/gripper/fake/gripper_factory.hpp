@@ -38,8 +38,6 @@ namespace Robotiq {
 //! \return A Gripper driving the in-process fake device.
 //! \throw DriverException if the fake device cannot be created, or if
 //!        connectionFrequency is negative.
-//! \note [[nodiscard]]: discarding the result leaks the only handle to the
-//!       Gripper this call was made to construct.
 //!
 //! \par Example
 //! \code{.cpp}

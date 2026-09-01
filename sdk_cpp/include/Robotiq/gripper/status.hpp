@@ -65,8 +65,6 @@ public:
    //! For simulators and for exercising status handling without hardware.
    //! \param bits The raw GRIPPER STATUS byte.
    //! \return A GripperStatusFlags wrapping \p bits.
-   //! \note [[nodiscard]]: a pure factory with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] static constexpr GripperStatusFlags fromRaw(uint8_t bits)
    {
       GripperStatusFlags flags;
@@ -75,18 +73,12 @@ public:
    }
 
    //! \return gACT — the echo of the last-sent rACT (activation request).
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] bool activated() const { return (_bits & register_map::kActivationStatusMask) != 0; }
 
    //! \return gGTO — the echo of the last-sent rGTO (go-to request).
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] bool goToEnabled() const { return (_bits & register_map::kGoToEchoMask) != 0; }
 
    //! \return gSTA — where the activation handshake stands; see ActivationState.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] ActivationState activationState() const
    {
       return static_cast<ActivationState>((_bits & register_map::kActivationStateMask)
@@ -94,8 +86,6 @@ public:
    }
 
    //! \return gOBJ — whether the fingers are moving or stopped on an object; see ObjectDetection.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] ObjectDetection objectDetection() const
    {
       return static_cast<ObjectDetection>((_bits & register_map::kObjectDetectionMask)
@@ -103,17 +93,11 @@ public:
    }
 
    //! \return The raw GRIPPER STATUS byte, unpacked.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] uint8_t raw() const { return _bits; }
 
    //! \return true if both flag bytes are identical.
-   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] bool operator==(GripperStatusFlags other) const { return _bits == other._bits; }
    //! \return true if the flag bytes differ.
-   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] bool operator!=(GripperStatusFlags other) const { return _bits != other._bits; }
 
 private:
@@ -152,27 +136,19 @@ struct GripperStatus
    std::array<uint8_t, register_map::kStatusBlockBytes - register_map::kStatusDocumentedBytes> reservedTail{};
 
    //! \return Raw block access, the manual's byte order. size() bytes wide.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] const uint8_t* data() const { return reinterpret_cast<const uint8_t*>(this); }
    //! \overload
    [[nodiscard]] uint8_t* data() { return reinterpret_cast<uint8_t*>(this); }
    //! \return The width of the status block in bytes (16, per the manual).
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] static constexpr std::size_t size() { return register_map::kStatusBlockBytes; }
 };
 
 //! \return true if every byte of the two status blocks is identical.
-//! \note [[nodiscard]]: a pure comparison with no side effects; calling it
-//!       only to discard the result is always a mistake.
 [[nodiscard]] inline bool operator==(const GripperStatus& lhs, const GripperStatus& rhs)
 {
    return std::memcmp(lhs.data(), rhs.data(), GripperStatus::size()) == 0;
 }
 //! \return true if any byte of the two status blocks differs.
-//! \note [[nodiscard]]: a pure comparison with no side effects; calling it
-//!       only to discard the result is always a mistake.
 [[nodiscard]] inline bool operator!=(const GripperStatus& lhs, const GripperStatus& rhs)
 {
    return !(lhs == rhs);

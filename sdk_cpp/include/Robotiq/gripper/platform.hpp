@@ -62,8 +62,6 @@ public:
    virtual ~Platform() = default;
 
    //! \return A newly constructed lock.
-   //! \note [[nodiscard]]: discarding the result leaks the only handle to
-   //!       the newly constructed lock.
    [[nodiscard]] virtual std::unique_ptr<Mutex> makeMutex() = 0;
 
    //! \brief Start a thread running \p fn.
@@ -72,8 +70,6 @@ public:
    //! join()ed before destruction.
    //! \param fn The thread's entry function.
    //! \return A handle to the running thread.
-   //! \note [[nodiscard]]: discarding the result leaks the only handle able
-   //!       to join() the thread before destruction.
    [[nodiscard]] virtual std::unique_ptr<Thread> spawn(std::function<void()> fn) = 0;
 
    //! \brief Sleep the calling thread until a monotonic time point, yielding the CPU.
@@ -91,8 +87,6 @@ public:
 //! Hosted-only: freestanding builds leave its TU out, so calling this
 //! there fails to link — construct your RTOS platform instead.
 //! \return The shared default Platform instance.
-//! \note [[nodiscard]]: discarding the result throws away the only handle
-//!       to the platform this call was made to obtain.
 [[nodiscard]] std::shared_ptr<Platform> makeDefaultPlatform();
 
 } // namespace Robotiq

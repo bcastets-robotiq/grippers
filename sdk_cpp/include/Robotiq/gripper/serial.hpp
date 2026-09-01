@@ -60,8 +60,6 @@ public:
    virtual void open() = 0;
 
    //! \return true if the link is currently open.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] virtual bool isOpen() const = 0;
 
    //! Close the link. Safe to call when already closed.
@@ -75,8 +73,6 @@ public:
    //! \return The bytes received — possibly fewer than \p size, or empty
    //!         when nothing arrived in time.
    //! \throw SerialIOException on wire-level failure.
-   //! \note [[nodiscard]]: discarding the result silently drops the bytes
-   //!       read.
    [[nodiscard]] virtual std::vector<uint8_t> read(size_t size, std::chrono::milliseconds timeout) = 0;
 
    //! \brief Write a sequence of bytes to the serial port.
@@ -85,8 +81,6 @@ public:
    virtual void write(const std::vector<uint8_t>& data) = 0;
 
    //! \return The per-transaction read/write timeout of this connection.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] virtual std::chrono::milliseconds getTimeout() const = 0;
 };
 } // namespace Robotiq

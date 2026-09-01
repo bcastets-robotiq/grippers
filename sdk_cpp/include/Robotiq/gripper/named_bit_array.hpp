@@ -47,8 +47,6 @@ public:
 
    //! \param bit Which bit to read.
    //! \return true if \p bit is set.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] constexpr bool get(BitEnum bit) const { return (_value & mask(bit)) != 0; }
 
    //! \param bit Which bit to set.
@@ -62,17 +60,11 @@ public:
    constexpr void set(BitEnum bit, bool on) { on ? set(bit) : unset(bit); }
 
    //! \return The raw bit pattern.
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] constexpr Underlying value() const { return _value; }
 
    //! \return true if both arrays hold the same bit pattern.
-   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] constexpr bool operator==(NamedBitArray other) const { return _value == other._value; }
    //! \return true if the bit patterns differ.
-   //! \note [[nodiscard]]: a pure comparison with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] constexpr bool operator!=(NamedBitArray other) const { return _value != other._value; }
 
 private:

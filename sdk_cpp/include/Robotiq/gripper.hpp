@@ -124,13 +124,9 @@ public:
 
    //! \return The last command block passed to setCommand() — or the
    //!         gripper's own echoed state, before the first call.
-   //! \note [[nodiscard]]: a pure snapshot read with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] GripperCommand getCommand() const;
 
    //! \return A snapshot of the gripper's last received status block.
-   //! \note [[nodiscard]]: a pure snapshot read with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] GripperStatus getStatus() const;
 
    // TODO: add an exchange-cycle sync primitive so a caller's control loop
@@ -140,8 +136,6 @@ public:
    // a human-readable form (named fields, decoded bits and fault codes)
 
    //! \return The current state of the background exchange; see ConnectionState.
-   //! \note [[nodiscard]]: a pure snapshot read with no side effects; calling
-   //!       it only to discard the result is always a mistake.
    [[nodiscard]] ConnectionState connectionState() const;
 
    //! \brief Return the runtime Platform used by this gripper.
@@ -166,8 +160,6 @@ public:
    //!    gripper.platform(),
    //!    std::chrono::seconds(1));
    //! \endcode
-   //! \note [[nodiscard]]: a pure accessor with no side effects; calling it
-   //!       only to discard the result is always a mistake.
    [[nodiscard]] Platform& platform() const noexcept;
 
 private:
