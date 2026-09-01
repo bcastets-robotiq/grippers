@@ -9,7 +9,7 @@
 //! \defgroup core_api Core API
 //! \brief Everything you need to control a Robotiq gripper.
 //!
-//! The gripper SDK is composed for the Gripper class  and free functions that
+//! The gripper SDK is composed of the Gripper class and free functions that
 //! operate on Gripper objects.
 //!
 //! \code
@@ -32,16 +32,16 @@
 //!                                lives inside)
 //! \endcode
 //!
-//! \note all gripper methods are not represented in this graph. check gripper
+//! \note all gripper methods are not represented in this graph. Check gripper
 //! class documentation for details.
 //!
-//! While Gripper class methods like setCommand and getStatus are enougth
+//! While Gripper class methods like setCommand and getStatus are enough
 //! to control the gripper, high level functions are provided to
 //! ease some actions like activation and fault recovery. Those functions are
-//! not members of the gripper class and direclty use gripper object
+//! not members of the gripper class and directly use gripper object
 //! to perform an action.
 //!
-//! Core API documentation is organized as follow: 
+//! Core API documentation is organized as follows:
 //!
 //!   - **Commands & Status** — the typed blocks Gripper exchanges
 //!     (GripperCommand out, GripperStatus in) and the fault codes they carry.
@@ -81,7 +81,7 @@
 
 //! \defgroup status Status
 //! \ingroup commanding
-//! \brief The information you recieve to understand gripper
+//! \brief The information you receive to understand gripper
 //! status.
 
 //! \defgroup gripper_status Gripper Status
@@ -92,7 +92,7 @@
 //! \ingroup status
 //! \brief The packed FAULT STATUS byte (byte 2 of the status block).
 
-//! \defgroup activation Activation &  Recovery
+//! \defgroup activation Activation & Recovery
 //! \ingroup commanding
 //! \brief The blocking activation / fault-recovery procedures built on
 //! top of Command and Status.
