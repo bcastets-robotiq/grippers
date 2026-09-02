@@ -41,7 +41,8 @@ class Gripper
 public:
 #if GRIPPERS_BUILD_DEFAULT_SERIAL
    //! \brief The common-case constructor: create a gripper object and
-   //!  start communication over the built-in serial transport.
+   //!  start communication over the built-in serial transport and the default
+   //!  platform.
    //!
    //! \param config see ConnectionConfig.
    //! \param logger Log sink; pass null to use the default stderr logger.
