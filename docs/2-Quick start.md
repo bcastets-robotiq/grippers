@@ -58,7 +58,8 @@ Robotiq::Gripper gripper = Robotiq::Gripper(config);
 ```
 
 ### Activate the gripper
-Gripper activation is the first action to perform before being able to use the gripper. The C++ driver provide a function to perform gripper activation.
+Gripper activation is the first action to perform before being able to use the
+gripper. The C++ driver provides a function to perform gripper activation.
 
 <!-- snippet: quick_start.cpp qs-activate -->
 ```cpp
