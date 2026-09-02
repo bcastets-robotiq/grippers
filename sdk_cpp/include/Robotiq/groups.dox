@@ -12,11 +12,11 @@
 //! The gripper SDK is composed of the Gripper class and free functions that
 //! operate on Gripper objects.
 //!
-//! \code
+//! \verbatim
 //!               ConnectionConfig                Serial + Platform + Logger
 //!             (SerialConfig + slave addr)     (custom transport, RTOS port,
 //!                     |                             or a test double)
-//!                     |                                 |    
+//!                     |                                 |
 //!                     |    (built-in serial)            |    (bring your own serial)
 //!                     +----------------+----------------+
 //!                                      v
@@ -30,7 +30,7 @@
 //!             GripperCommand   GripperStatus   ConnectionState
 //!               (you send)     (FaultStatus
 //!                                lives inside)
-//! \endcode
+//! \endverbatim
 //!
 //! \note all gripper methods are not represented in this graph. Check gripper
 //! class documentation for details.
