@@ -28,8 +28,10 @@ using Robotiq::ObjectDetection;  // gOBJ: moving / stopped-on-object / at-reques
 namespace {
 // Any rate a serial link plausibly runs at. Also what catches a negative:
 // stoul("-1") wraps to a huge value rather than throwing.
+//! [baudrate-bounds]
 constexpr unsigned long kMinBaudrate = 1;
 constexpr unsigned long kMaxBaudrate = 1000000;
+//! [baudrate-bounds]
 
 //! \brief Whether the fingers have stopped moving.
 //!
@@ -61,6 +63,7 @@ bool moveTo(Gripper& gripper, GripperCommand& command, uint8_t position, Robotiq
    command.positionRequest = position;
    command.action.set(ActionRequestBit::GoTo, true); // execute the move
    gripper.setCommand(command);
+   //! [move-to-three-waits]
    if(!Robotiq::waitFor([&] { return gripper.getStatus().positionRequestEcho == position; }, 1s))
    {
       logger.log(Robotiq::Logger::Level::Error, "the gripper never echoed the position request");
@@ -79,6 +82,7 @@ bool moveTo(Gripper& gripper, GripperCommand& command, uint8_t position, Robotiq
       logger.log(Robotiq::Logger::Level::Error, "the motion never settled");
       return false;
    }
+   //! [move-to-three-waits]
    logger.log(Robotiq::Logger::Level::Info, "Position: " + std::to_string(gripper.getStatus().position) + "/255");
    return true;
 }
@@ -91,11 +95,13 @@ bool moveTo(Gripper& gripper, GripperCommand& command, uint8_t position, Robotiq
 //!         EXIT_FAILURE on a bad argument, a connection error, or a timeout.
 int main(int argc, char* argv[])
 {
+   //! [argument-handling]
    if(argc < 2)
    {
       std::cerr << "Usage: " << argv[0] << " <port> [baudrate]\n";
       return EXIT_FAILURE;
    }
+   //! [argument-handling]
 
    // ConnectionConfig bundles the serial link and Modbus addressing; the
    // slave address and exchange frequency default to sane values, so only
@@ -106,11 +112,13 @@ int main(int argc, char* argv[])
    {
       try
       {
+         //! [baudrate-parse-and-check]
          const unsigned long parsed = std::stoul(argv[2]);
          if(parsed < kMinBaudrate || parsed > kMaxBaudrate)
          {
             throw std::out_of_range("baudrate outside the supported range");
          }
+         //! [baudrate-parse-and-check]
          config.serial.baudrate = static_cast<uint32_t>(parsed);
       }
       catch(const std::exception&)
@@ -124,7 +132,9 @@ int main(int argc, char* argv[])
    // tells library and application lines apart in the shared stream.
    // (A real integration gets the same separation from its injected
    // adapter, e.g. a named rclcpp logger.)
+   //! [logger-example-name]
    auto logger = std::make_shared<Robotiq::StderrLogger>("example");
+   //! [logger-example-name]
 
    // Constructing Gripper opens the serial port, does one initial read to
    // confirm a gripper answers, and starts the background exchange thread
@@ -134,8 +144,11 @@ int main(int argc, char* argv[])
    std::unique_ptr<Gripper> gripper;
    try
    {
+      //! [logger-robotiq-name]
       gripper = std::make_unique<Gripper>(config, std::make_shared<Robotiq::StderrLogger>("robotiq")); // opens and starts exchanging
+      //! [logger-robotiq-name]
    }
+   //! [connection-error-checklist]
    catch(const std::exception& ex)
    {
       std::cerr << "Error: " << ex.what() << "\n\n"
@@ -145,6 +158,7 @@ int main(int argc, char* argv[])
                 << "  - you have permission to use it (Linux: join the 'dialout' group).\n";
       return EXIT_FAILURE;
    }
+   //! [connection-error-checklist]
 
    // activate() blocks until the gripper reports the activation handshake
    // complete (or Timeout/AlreadyActive/FaultLatched). It's a free function,
@@ -161,11 +175,13 @@ int main(int argc, char* argv[])
       activation = Robotiq::recoverFromFault(*gripper);
    }
    //! [activation-recovery]
+   //! [activation-final-check]
    if(activation != ActivationResult::Activated && activation != ActivationResult::AlreadyActive)
    {
       logger->log(Robotiq::Logger::Level::Error, "activation failed or timed out");
       return EXIT_FAILURE;
    }
+   //! [activation-final-check]
 
    // Keep one command block and update it before each send: it is
    // persistent state, not rebuilt per move.

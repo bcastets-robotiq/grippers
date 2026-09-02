@@ -9,6 +9,7 @@ the robust version and why.
 
 ## Argument handling
 
+<!-- snippet: move_gripper.cpp argument-handling -->
 ```cpp
 if(argc < 2)
 {
@@ -18,13 +19,20 @@ if(argc < 2)
 ```
 
 The port is required; the baudrate is optional and defaults to
-`ConnectionConfig`'s own default (115200) if omitted. When a baudrate
-is given, it's parsed and range-checked before use:
+`ConnectionConfig`'s own default (115200) if omitted. The accepted range
+is bounded at both ends:
 
+<!-- snippet: move_gripper.cpp baudrate-bounds -->
 ```cpp
 constexpr unsigned long kMinBaudrate = 1;
 constexpr unsigned long kMaxBaudrate = 1000000;
-...
+```
+
+When a baudrate is given, it's parsed and range-checked against those
+bounds before use:
+
+<!-- snippet: move_gripper.cpp baudrate-parse-and-check -->
+```cpp
 const unsigned long parsed = std::stoul(argv[2]);
 if(parsed < kMinBaudrate || parsed > kMaxBaudrate)
 {
@@ -45,6 +53,7 @@ Constructing `Gripper` can throw (`SerialIOException` or
 The example catches it once, right at construction, and turns it into a
 checklist instead of a raw exception message:
 
+<!-- snippet: move_gripper.cpp connection-error-checklist -->
 ```cpp
 catch(const std::exception& ex)
 {
@@ -62,19 +71,30 @@ exception in practice: nothing plugged in, the wrong port name for the
 platform, and (Linux only) not being in the `dialout` group — see
 [Serial port notes](1-Environment%20setup.md#serial-port-notes).
 
-## Sharing one logger
+## Naming the loggers
 
+The SDK logs through an injectable `Logger`. The example creates one,
+named `"example"`, for its own narration ("Activating...", "Opening...",
+"Closing..."):
+
+<!-- snippet: move_gripper.cpp logger-example-name -->
 ```cpp
-auto logger = std::make_shared<Robotiq::StderrLogger>();
-gripper = std::make_unique<Gripper>(config, logger);
+auto logger = std::make_shared<Robotiq::StderrLogger>("example");
 ```
 
-The SDK logs through an injectable `Logger`; the example passes the
-same instance to the SDK *and* uses it for its own narration ("Activating...",
-"Opening...", "Closing..."). That's not just for convenience — it's
-what keeps the SDK's own log lines and the example's own progress
-messages on one ordered stream, instead of two independently-timed
-sources that could interleave confusingly.
+...and a second, separately-named `"robotiq"` instance passed directly
+to the `Gripper` constructor, for the SDK's own internal logging:
+
+<!-- snippet: move_gripper.cpp logger-robotiq-name -->
+```cpp
+gripper = std::make_unique<Gripper>(config, std::make_shared<Robotiq::StderrLogger>("robotiq")); // opens and starts exchanging
+```
+
+Both still write to the same stream (stderr), so this isn't about
+separating *where* the lines go — it's what keeps them told apart once
+they're there: a reader (or a log aggregator) can tell the SDK's own
+diagnostic lines apart from the example's own progress messages, instead
+of both landing unlabeled and easy to confuse with each other.
 
 ## Handling a latched fault at activation
 
@@ -82,14 +102,23 @@ Quick start's activation note shows how to force a gripper into a
 deactivated state. `move_gripper.cpp` instead handles the case where
 activation can't proceed at all because a fault is already latched:
 
+<!-- snippet: move_gripper.cpp activation-recovery -->
 ```cpp
 ActivationResult activation = Robotiq::activate(*gripper);
 if(activation == ActivationResult::FaultLatched)
 {
+   // Recovery releases any grip and sweeps the fingers, so the SDK
+   // never runs it implicitly; this example has no part to drop.
+   logger->log(Robotiq::Logger::Level::Warn, "fault latched; recovering (the fingers will move)");
    activation = Robotiq::recoverFromFault(*gripper);
 }
+```
+
+<!-- snippet: move_gripper.cpp activation-final-check -->
+```cpp
 if(activation != ActivationResult::Activated && activation != ActivationResult::AlreadyActive)
 {
+   logger->log(Robotiq::Logger::Level::Error, "activation failed or timed out");
    return EXIT_FAILURE;
 }
 ```
@@ -107,19 +136,25 @@ Sending a `GoTo` command doesn't mean the move is done, or even that
 the gripper received it. `moveTo()` waits in three stages, each
 catching a different way that assumption could be wrong:
 
+<!-- snippet: move_gripper.cpp move-to-three-waits -->
 ```cpp
 if(!Robotiq::waitFor([&] { return gripper.getStatus().positionRequestEcho == position; }, 1s))
 {
-   return false; // the gripper never even acknowledged the request
+   logger.log(Robotiq::Logger::Level::Error, "the gripper never echoed the position request");
+   return false;
 }
+// Object detection can lag the echo by a few cycles: give the motion
+// a moment to start (returns early once it does). A short move can be
+// over before it is ever seen moving, so this one is only advisory.
 if(!Robotiq::waitFor([&] { return gripper.getStatus().gripperStatus.objectDetection() == ObjectDetection::Moving; },
                      200ms))
 {
-   // no motion seen within 200 ms — only advisory, see below
+   logger.log(Robotiq::Logger::Level::Debug, "no motion seen within 200 ms; it may already be done");
 }
 if(!Robotiq::waitFor([&] { return motionSettled(gripper); }, 5s))
 {
-   return false; // motion started (or the check above just missed it) but never settled
+   logger.log(Robotiq::Logger::Level::Error, "the motion never settled");
+   return false;
 }
 ```
 

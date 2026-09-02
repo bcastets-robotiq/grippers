@@ -15,6 +15,7 @@
 #include <Robotiq/gripper/named_bit_array.hpp>
 #include <Robotiq/gripper/register_map.hpp>
 #include <Robotiq/gripper/serial.hpp>
+#include <Robotiq/gripper/stderr_logger.hpp>
 #include <Robotiq/gripper/throttle.hpp>
 
 #include <chrono>
@@ -129,16 +130,16 @@ void motionSettledExample(Robotiq::Gripper& gripper)
 }
 //! [motion-settled-example]
 
-//! [fault-severity-check]
 void faultSeverityCheck(Robotiq::Gripper& gripper)
 {
+   //! [fault-severity-check]
    Robotiq::FaultStatus fault = gripper.getStatus().faultStatus;
    if(Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
    {
       (void)Robotiq::recoverFromFault(gripper);
    }
+   //! [fault-severity-check]
 }
-//! [fault-severity-check]
 
 //! [uart-logger]
 class UartLogger : public Robotiq::Logger
@@ -251,6 +252,76 @@ void throttleUsage(Robotiq::Logger& logger, bool running)
    }
 }
 //! [throttle-usage]
+
+void autoreleaseThenMove(Robotiq::Gripper& gripper)
+{
+   //! [autorelease-then-move]
+   // Build and set an autorelease command
+   Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+   command.action.set(Robotiq::ActionRequestBit::AutoRelease);
+   gripper.setCommand(command);
+
+   // Build and set a command to move the gripper to the position 100
+   command = Robotiq::GripperCommand::defaults();
+   command.action.set(Robotiq::ActionRequestBit::GoTo);
+   command.positionRequest = 100;
+   gripper.setCommand(command);
+   //! [autorelease-then-move]
+}
+
+void autoreleaseThenMoveWithWait(Robotiq::Gripper& gripper)
+{
+   //! [autorelease-then-move-with-wait]
+   // Build and set an autorelease command
+   Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
+   command.action.set(Robotiq::ActionRequestBit::AutoRelease);
+   gripper.setCommand(command);
+
+   // Wait
+   (void)Robotiq::waitFor(
+      [&] { return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress); }, 10s);
+
+   // Build and set a command to move the gripper to the position 100
+   command = Robotiq::GripperCommand::defaults();
+   command.action.set(Robotiq::ActionRequestBit::GoTo);
+   command.positionRequest = 100;
+   gripper.setCommand(command);
+   //! [autorelease-then-move-with-wait]
+}
+
+void waitForMotionSettled(Robotiq::Gripper& gripper)
+{
+   //! [wait-for-motion-settled]
+   bool settled = Robotiq::waitFor(
+      [&] { return gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving; },
+      10s);
+   //! [wait-for-motion-settled]
+   (void)settled;
+}
+
+void activateOnly(Robotiq::Gripper& gripper)
+{
+   //! [activate-only]
+   Robotiq::ActivationResult result = Robotiq::activate(gripper);
+   //! [activate-only]
+   (void)result;
+}
+
+void recoverFromFaultOnly(Robotiq::Gripper& gripper)
+{
+   //! [recover-from-fault-only]
+   Robotiq::ActivationResult result = Robotiq::recoverFromFault(gripper);
+   //! [recover-from-fault-only]
+   (void)result;
+}
+
+void basicLoggerInjection(Robotiq::ConnectionConfig& config)
+{
+   //! [basic-logger-injection]
+   auto logger = std::make_shared<Robotiq::StderrLogger>();
+   Robotiq::Gripper gripper(config, logger);
+   //! [basic-logger-injection]
+}
 
 } // namespace
 

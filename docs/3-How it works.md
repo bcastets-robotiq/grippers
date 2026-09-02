@@ -126,6 +126,7 @@ As a consequence, if you write back-to-back `setCommand()` instructions, only th
 
 As an example, the code below sets an autorelease command and, right after that, a move command.
 
+<!-- snippet: snippets.cpp autorelease-then-move -->
 ```cpp
 // Build and set an autorelease command
 Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
@@ -136,7 +137,7 @@ gripper.setCommand(command);
 command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::GoTo);
 command.positionRequest = 100;
-gripper.setCommand(command)
+gripper.setCommand(command);
 ```
 
 If the autorelease command is effectively sent to the gripper, the gripper will
@@ -148,20 +149,22 @@ Looking at this code, you may think that the second command, asking for the grip
 
 To have the autorelease command effectively sent to the gripper, it is necessary to wait for the gripper to acknowledge reception of the command before the next `setCommand()`.
 
+<!-- snippet: snippets.cpp autorelease-then-move-with-wait -->
 ```cpp
 // Build and set an autorelease command
 Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::AutoRelease);
 gripper.setCommand(command);
 
-// Wait 
-Robotiq::waitFor([&]{return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress);},10s)
+// Wait
+(void)Robotiq::waitFor(
+   [&] { return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress); }, 10s);
 
 // Build and set a command to move the gripper to the position 100
 command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::GoTo);
 command.positionRequest = 100;
-gripper.setCommand(command)
+gripper.setCommand(command);
 ```
 
 The following section presents the wait function used in the code above.
@@ -172,10 +175,11 @@ The following section presents the wait function used in the code above.
 timeout) polls a predicate until it becomes true or the timeout
 elapses:
 
+<!-- snippet: snippets.cpp wait-for-motion-settled -->
 ```cpp
 bool settled = Robotiq::waitFor(
-    [&]{ return gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving; },
-    10s);
+   [&] { return gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving; },
+   10s);
 ```
 
 The predicate is a C++ lambda — an anonymous inline function. `[&]` captures
@@ -193,6 +197,7 @@ Before sending motion commands, the gripper must be activated once.
 `activate()` is a blocking function that runs the activation handshake
 (or waits out one already in progress):
 
+<!-- snippet: snippets.cpp activate-only -->
 ```cpp
 Robotiq::ActivationResult result = Robotiq::activate(gripper);
 ```
@@ -214,6 +219,7 @@ If `activate()` returns `FaultLatched`, or a `Major` fault shows up
 later during operation (see [Error handling](#error-handling) below),
 call `Robotiq::recoverFromFault()`:
 
+<!-- snippet: snippets.cpp recover-from-fault-only -->
 ```cpp
 Robotiq::ActivationResult result = Robotiq::recoverFromFault(gripper);
 ```
@@ -237,11 +243,12 @@ Constructing a `Gripper` can throw:
 Not every fault needs recovery. `Robotiq::severity()` classifies the
 raw fault code from `status.faultStatus` into a `FaultSeverity`:
 
+<!-- snippet: snippets.cpp fault-severity-check -->
 ```cpp
 Robotiq::FaultStatus fault = gripper.getStatus().faultStatus;
-if (Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
+if(Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
 {
-    Robotiq::recoverFromFault(gripper);
+   (void)Robotiq::recoverFromFault(gripper);
 }
 ```
 
@@ -268,25 +275,44 @@ The communication flow to control the gripper is typically the following:
 - Wait for the gripper to complete the action
 - Check final status
 
+Build a command:
+
+<!-- snippet: quick_start.cpp qs-create-command -->
 ```cpp
-// Build command
 Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::GoTo);
 command.positionRequest = 100;
 command.speed = 255;
 command.force = 255;
+```
 
-// Send command
+Send the command:
+
+<!-- snippet: quick_start.cpp qs-send-command -->
+```cpp
 gripper.setCommand(command);
+```
 
-// Wait for acknowledge
+Wait for the gripper to acknowledge the command, then wait for it to complete:
+
+<!-- snippet: quick_start.cpp qs-wait -->
+```cpp
+// 6- Wait for the gripper to echo
 bool positionRequestEchoed = Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
-// Wait for action to complete
+// 7- Wait for the action to complete
 bool motionCompleted = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+```
 
-// Check final status
+Check final status:
+
+<!-- snippet: quick_start.cpp qs-status -->
+```cpp
+// 8- retrieve status
 uint8_t currentPosition = gripper.getStatus().position;
+
+// Print retrieved status
+std::cout << "Current position : " << static_cast<int>(currentPosition) << std::endl;
 ```
 
 ## How the C++ driver handles communication with the gripper
@@ -304,6 +330,7 @@ FC 0x17 Modbus (read&write) transactions with the gripper — up to ~200 Hz at 1
 default logger: `StderrLogger` on a hosted build, a do-nothing
 `NullLogger` on a freestanding target with no console.
 
+<!-- snippet: snippets.cpp basic-logger-injection -->
 ```cpp
 auto logger = std::make_shared<Robotiq::StderrLogger>();
 Robotiq::Gripper gripper(config, logger);
