@@ -297,7 +297,6 @@ void waitForMotionSettled(Robotiq::Gripper& gripper)
       [&] { return gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving; },
       10s);
    //! [wait-for-motion-settled]
-   (void)settled;
 }
 
 void activateOnly(Robotiq::Gripper& gripper)
@@ -305,7 +304,6 @@ void activateOnly(Robotiq::Gripper& gripper)
    //! [activate-only]
    Robotiq::ActivationResult result = Robotiq::activate(gripper);
    //! [activate-only]
-   (void)result;
 }
 
 void recoverFromFaultOnly(Robotiq::Gripper& gripper)
@@ -313,7 +311,6 @@ void recoverFromFaultOnly(Robotiq::Gripper& gripper)
    //! [recover-from-fault-only]
    Robotiq::ActivationResult result = Robotiq::recoverFromFault(gripper);
    //! [recover-from-fault-only]
-   (void)result;
 }
 
 void basicLoggerInjection(Robotiq::ConnectionConfig& config)
