@@ -246,10 +246,10 @@ in detail).
 itself, not when consuming it, so it doesn't apply to the
 [vendoring setup](#bring-the-sdk-into-your-project) above: when your
 own project pulls the SDK in with
-`add_subdirectory(path/to/grippers/sdk_cpp)`, both default to `OFF`
-automatically, so your build doesn't also compile this repo's example
-and test binaries; turn them back on explicitly if you want them anyway
-(`-DGRIPPERS_BUILD_TESTS=ON`).
+`add_subdirectory(path/to/grippers/sdk_cpp)`, both GRIPPERS_BUILD_EXAMPLES and
+GRIPPERS_BUILD_TESTS default to OFF automatically, so your build doesn't also
+compile this repo's example and test binaries; turn them back on explicitly if
+you want them anyway (`-DGRIPPERS_BUILD_TESTS=ON`).
 
 `GRIPPERS_BUILD_FAKE` and `GRIPPERS_BUILD_DEFAULT_SERIAL` both need
 `GRIPPERS_HOSTED=ON` — configuring with one of them `ON` while
