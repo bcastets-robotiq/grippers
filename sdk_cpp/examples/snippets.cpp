@@ -28,16 +28,17 @@ using namespace std::chrono_literals;
 
 namespace {
 
-//! [configure-connection]
 void configureConnection()
 {
+   //! [configure-connection]
    Robotiq::ConnectionConfig config;
    config.modbusSlaveAddress = 0x09;
    config.serial.port = "/dev/ttyUSB0";
    config.serial.baudrate = 115200;
    config.connectionFrequency = 100.0; // Hz
+   //! [configure-connection]
 }
-//! [configure-connection]
+
 
 void commandActionBits()
 {
@@ -91,17 +92,15 @@ void statusGripperStatusFields(Robotiq::Gripper& gripper)
    //! [status-gripper-status-fields]
 }
 
-//! [action-request-bits]
-void actionRequestBits(Robotiq::Gripper& gripper)
+void actionRequestBits()
 {
+   //! [action-request-bits]
    Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
    command.action.set(Robotiq::ActionRequestBit::GoTo);                // start moving (same as set(GoTo, true))
    command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);  // ...but not an emergency release
-   bool goTo = command.action.get(Robotiq::ActionRequestBit::GoTo);    // true
-   gripper.setCommand(command);
-   (void)goTo;
+   //! [action-request-bits]
 }
-//! [action-request-bits]
+
 
 //! [gripper-status-flags]
 void gripperStatusFlags(Robotiq::Gripper& gripper)
@@ -112,10 +111,8 @@ void gripperStatusFlags(Robotiq::Gripper& gripper)
    if(status.gripperStatus.activationState() == Robotiq::ActivationState::Complete
       && status.gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving)
    {
-      // motion has settled — status.position holds the final rPR (0..255)
+      // motion has settled
    }
-   (void)activated;
-   (void)goTo;
 }
 //! [gripper-status-flags]
 
@@ -125,10 +122,12 @@ void motionSettledExample(Robotiq::Gripper& gripper)
    Robotiq::GripperStatus status = gripper.getStatus();
    if(status.gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving)
    {
-      // motion has settled — status.position holds the final rPR (0..255)
+      // motion has settled
    }
+   
 }
 //! [motion-settled-example]
+
 
 void faultSeverityCheck(Robotiq::Gripper& gripper)
 {
@@ -140,6 +139,7 @@ void faultSeverityCheck(Robotiq::Gripper& gripper)
    }
    //! [fault-severity-check]
 }
+
 
 //! [uart-logger]
 class UartLogger : public Robotiq::Logger
@@ -167,9 +167,10 @@ void useCustomLogger()
 }
 //! [uart-logger]
 
-//! [named-bit-array]
+
 void namedBitArrayUsage()
 {
+   //! [named-bit-array]
    enum class Flag : uint8_t
    {
       A = 0,
@@ -179,26 +180,26 @@ void namedBitArrayUsage()
    bits.set(Flag::A);
    bits.set(Flag::B, false);
    bool a = bits.get(Flag::A); // true
-   (void)a;
+   //! [named-bit-array]
 }
-//! [named-bit-array]
 
-//! [make-fake-gripper]
+
+
 void makeFakeGripperUsage()
 {
+   //! [make-fake-gripper]
    auto gripper = Robotiq::makeFakeGripper(); // no hardware needed
    (void)Robotiq::activate(*gripper);
+   //! [make-fake-gripper]
 }
-//! [make-fake-gripper]
 
 //! [decode-raw-status-byte]
 void decodeRawStatusByte(uint8_t rawStatusByte)
 {
+   
    uint8_t gSTA = (rawStatusByte & Robotiq::register_map::kActivationStateMask)
                   >> Robotiq::register_map::kActivationStateShift;
-   bool activated = (rawStatusByte & Robotiq::register_map::kActivationStatusMask) != 0;
-   (void)gSTA;
-   (void)activated;
+   
 }
 //! [decode-raw-status-byte]
 
@@ -237,7 +238,6 @@ void waitWithPlatform(Robotiq::Gripper& gripper, uint8_t target)
       [&] { return gripper.getStatus().positionRequestEcho == target; },
       gripper.platform(),
       std::chrono::seconds(1));
-   (void)settled;
 }
 //! [wait-with-platform]
 
@@ -288,6 +288,7 @@ void autoreleaseThenMoveWithWait(Robotiq::Gripper& gripper)
    gripper.setCommand(command);
    //! [autorelease-then-move-with-wait]
 }
+
 
 void waitForMotionSettled(Robotiq::Gripper& gripper)
 {
