@@ -135,7 +135,7 @@ void faultSeverityCheck(Robotiq::Gripper& gripper)
    Robotiq::FaultStatus fault = gripper.getStatus().faultStatus;
    if(Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
    {
-      (void)Robotiq::recoverFromFault(gripper);
+      Robotiq::recoverFromFault(gripper);
    }
    //! [fault-severity-check]
 }
@@ -189,7 +189,7 @@ void makeFakeGripperUsage()
 {
    //! [make-fake-gripper]
    auto gripper = Robotiq::makeFakeGripper(); // no hardware needed
-   (void)Robotiq::activate(*gripper);
+   Robotiq::activate(*gripper);
    //! [make-fake-gripper]
 }
 
@@ -278,7 +278,7 @@ void autoreleaseThenMoveWithWait(Robotiq::Gripper& gripper)
    gripper.setCommand(command);
 
    // Wait
-   (void)Robotiq::waitFor(
+   Robotiq::waitFor(
       [&] { return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress); }, 10s);
 
    // Build and set a command to move the gripper to the position 100

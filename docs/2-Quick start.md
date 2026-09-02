@@ -60,8 +60,6 @@ Robotiq::Gripper gripper = Robotiq::Gripper(config);
 ### Activate the gripper
 Gripper activation is the first action to perform before being able to use the gripper. The C++ driver provide a function to perform gripper activation.
 
-The activate function is marked `[[nodiscard]]`, which means the result must be saved into a variable, it cannot be discarded.
-
 <!-- snippet: quick_start.cpp qs-activate -->
 ```cpp
 Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
@@ -99,8 +97,6 @@ gripper.setCommand(command);
 
 ### Wait for the action to be completed
 The C++ driver comes with a convenient wait function that can be used to wait for a gripper action to complete before moving to the next step of the program.
-
-The wait function is marked `[[nodiscard]]`, which means the result must be saved into a variable, it cannot be discarded.
 
 First we have to wait for the gripper to acknowledge the reception of the
 command. Then we can wait for the command to complete.

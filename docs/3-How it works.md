@@ -157,7 +157,7 @@ command.action.set(Robotiq::ActionRequestBit::AutoRelease);
 gripper.setCommand(command);
 
 // Wait
-(void)Robotiq::waitFor(
+Robotiq::waitFor(
    [&] { return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress); }, 10s);
 
 // Build and set a command to move the gripper to the position 100
@@ -248,7 +248,7 @@ raw fault code from `status.faultStatus` into a `FaultSeverity`:
 Robotiq::FaultStatus fault = gripper.getStatus().faultStatus;
 if(Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
 {
-   (void)Robotiq::recoverFromFault(gripper);
+   Robotiq::recoverFromFault(gripper);
 }
 ```
 
@@ -258,13 +258,6 @@ if(Robotiq::severity(fault.gripperFault()) == Robotiq::FaultSeverity::Major)
 | `Warning` | informational; clears on its own |
 | `Minor` | degraded operation; clears on its own |
 | `Major` | needs a reset (rACT rising edge) to clear — call [`recoverFromFault()`](#recovering-from-a-fault) |
-
-### Discard nothing
-
-`activate()`, `recoverFromFault()`, and `waitFor()`/`waitUntil()` are
-all marked `[[nodiscard]]` — their result must be checked and acted on,
-since silently discarding it hides a `FaultLatched` gripper or a
-timed-out wait.
 
 ## Control method
 

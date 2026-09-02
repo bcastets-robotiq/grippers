@@ -136,7 +136,7 @@ enum class ActivationResult
 //!
 //! \par Example
 //! \snippet move_gripper.cpp activation-recovery
-[[nodiscard]] ActivationResult activate(Gripper& gripper, std::chrono::milliseconds timeout = std::chrono::seconds(15));
+ActivationResult activate(Gripper& gripper, std::chrono::milliseconds timeout = std::chrono::seconds(15));
 
 //! \ingroup activation
 //! \brief Run the manual's fault-recovery handshake, unconditionally.
@@ -148,6 +148,6 @@ enum class ActivationResult
 //! \param gripper The gripper to recover.
 //! \param timeout How long to wait for the handshake to complete.
 //! \return Activated on success; Timeout if completion never arrived in time.
-[[nodiscard]] ActivationResult recoverFromFault(Gripper& gripper,
+ActivationResult recoverFromFault(Gripper& gripper,
                                                 std::chrono::milliseconds timeout = std::chrono::seconds(15));
 } // namespace Robotiq

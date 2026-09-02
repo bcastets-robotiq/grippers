@@ -34,7 +34,7 @@ namespace Robotiq {
 //! \param pollPeriod How long to sleep between polls.
 //! \return true if \p predicate held before \p deadline; false on timeout.
 template <typename Predicate>
-[[nodiscard]] bool waitUntil(Predicate predicate,
+bool waitUntil(Predicate predicate,
                              Platform& platform,
                              std::chrono::steady_clock::time_point deadline,
                              std::chrono::milliseconds pollPeriod = std::chrono::milliseconds(2))
@@ -62,7 +62,7 @@ template <typename Predicate>
 //! \param pollPeriod How long to sleep between polls.
 //! \return true if \p predicate held within \p timeout; false on timeout.
 template <typename Predicate>
-[[nodiscard]] bool waitFor(Predicate predicate,
+bool waitFor(Predicate predicate,
                            Platform& platform,
                            std::chrono::milliseconds timeout,
                            std::chrono::milliseconds pollPeriod = std::chrono::milliseconds(2))
@@ -75,7 +75,7 @@ template <typename Predicate>
 //! \overload
 //! Sleeps on the default (std::thread-backed) platform. Hosted-only.
 template <typename Predicate>
-[[nodiscard]] bool waitUntil(Predicate predicate,
+bool waitUntil(Predicate predicate,
                              std::chrono::steady_clock::time_point deadline,
                              std::chrono::milliseconds pollPeriod = std::chrono::milliseconds(2))
 {
@@ -86,7 +86,7 @@ template <typename Predicate>
 //! \overload
 //! Sleeps on the default (std::thread-backed) platform. Hosted-only.
 template <typename Predicate>
-[[nodiscard]] bool waitFor(Predicate predicate,
+bool waitFor(Predicate predicate,
                            std::chrono::milliseconds timeout,
                            std::chrono::milliseconds pollPeriod = std::chrono::milliseconds(2))
 {

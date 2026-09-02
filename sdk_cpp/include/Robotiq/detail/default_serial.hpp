@@ -41,28 +41,20 @@ public:
    DefaultSerial& operator=(const DefaultSerial&) = delete;
 
    void open() override;
-   // [[nodiscard]]: a pure accessor with no side effects; discarding the
-   // result is always a mistake.
+
    [[nodiscard]] bool isOpen() const override;
    void close() override;
 
-   // [[nodiscard]]: discarding the result silently drops the bytes read.
    [[nodiscard]] std::vector<uint8_t> read(size_t size, std::chrono::milliseconds timeout) override;
    void write(const std::vector<uint8_t>& data) override;
 
-   // [[nodiscard]]: a pure accessor with no side effects; discarding the
-   // result is always a mistake.
    [[nodiscard]] std::chrono::milliseconds getTimeout() const override;
 
    // Link parameters this connection was constructed with.
-   // [[nodiscard]]: a pure accessor with no side effects; discarding the
-   // result is always a mistake.
    [[nodiscard]] const SerialConfig& getConfig() const;
 
 private:
    // Best-effort sysfs write; returns false when it could not be applied.
-   // [[nodiscard]]: discarding the result silently hides whether the
-   // latency-timer tuning actually applied.
    [[nodiscard]] bool applyLatencyTimer() const;
 
    struct sp_port* _portHandle = nullptr;
@@ -72,8 +64,6 @@ private:
 
 // Strip the directory part of a device path ("/dev/ttyUSB0" -> "ttyUSB0");
 // the sysfs latency_timer path is derived from it.
-// [[nodiscard]]: a pure conversion with no side effects; discarding the
-// result is always a mistake.
 [[nodiscard]] std::string deviceBasename(const std::string& port);
 
 } // namespace Robotiq::detail
