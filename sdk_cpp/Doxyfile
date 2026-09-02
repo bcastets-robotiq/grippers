@@ -14,7 +14,7 @@
 
 PROJECT_NAME           = "Robotiq Grippers C++ SDK"
 PROJECT_NUMBER         = 0.1.0
-PROJECT_BRIEF          = "C++ SDK for Robotiq 2F adaptive grippers"
+PROJECT_BRIEF          = "C++ SDK for Robotiq adaptive grippers"
 OUTPUT_DIRECTORY       =
 
 INPUT                  = include
