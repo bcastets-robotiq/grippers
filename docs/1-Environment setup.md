@@ -212,6 +212,8 @@ git add third_party/grippers
   driver in System Settings → Privacy & Security and make sure it — not
   Apple's built-in FTDI driver — binds your adapter (`kextstat | grep -i ftdi`).
   Otherwise ~60 Hz is the ceiling on the default driver.
+  **Unproven:** this procedure hasn't been verified on real hardware; if you
+  try it, please report back with what worked (or didn't).
 - Factory-default link settings: 115200 baud, 8N1, Modbus slave 0x09.
 - Port naming: `/dev/ttyUSB0` on Linux, `COM3` on Windows,
   `/dev/tty.usbserial-XXXX` on macOS.
