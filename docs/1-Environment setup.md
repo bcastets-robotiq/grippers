@@ -266,7 +266,7 @@ cmake -S sdk_cpp -B build -DGRIPPERS_BUILD_DEFAULT_SERIAL=OFF
 # -- grippers: tests need GRIPPERS_BUILD_DEFAULT_SERIAL; skipping them
 ```
 
-You'd flip that one off, on an otherwise-hosted desktop build, if
-you're injecting your own `Serial` (e.g. talking to the gripper through
+You'd flip GRIPPERS_BUILD_DEFAULT_SERIAL off, on an otherwise-hosted desktop
+build, if you're injecting your own `Serial` (e.g. talking to the gripper through
 something other than libserialport) and don't want the libserialport
 dependency at all.
