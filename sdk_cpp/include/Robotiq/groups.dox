@@ -45,6 +45,8 @@
 //!
 //!   - **Commands & Status** — the typed blocks Gripper exchanges
 //!     (GripperCommand out, GripperStatus in) and the fault codes they carry.
+//!   - **Activation & Recovery** — the blocking activation and
+//!     fault-recovery procedures built on top of Commands & Status.
 //!   - **Connection & Configuration** — how a Gripper is told what to
 //!     connect to, and what state that connection is in.
 //!   - **Runtime & Extension Points** — the injectable pieces (Serial,
@@ -69,7 +71,6 @@
 //!   - **Status** — what you read back: GripperStatus, a 6-byte block
 //!     whose **Gripper Status** (byte 0) and **Fault Status** (byte 2)
 //!     bytes each pack individual flags.
-//!   - **Activation** — the blocking procedures built on top of both.
 
 //! \defgroup command Command
 //! \ingroup commanding
@@ -93,7 +94,7 @@
 //! \brief The packed FAULT STATUS byte (byte 2 of the status block).
 
 //! \defgroup activation Activation & Recovery
-//! \ingroup commanding
+//! \ingroup core_api
 //! \brief The blocking activation / fault-recovery procedures built on
 //! top of Command and Status.
 
