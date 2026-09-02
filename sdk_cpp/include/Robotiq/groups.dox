@@ -116,6 +116,7 @@
 //! \brief The injectable transport, platform, and logging interfaces
 //! Gripper is built on — implement these to add a custom transport, port
 //! to an RTOS, or capture logs in tests.
+//! Most users do not need to implement these interfaces.
 //!
 //! Split by what you're implementing, plus what a failure in any of them
 //! looks like to the caller:
