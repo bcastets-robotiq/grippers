@@ -22,7 +22,7 @@ int main() {
 
     // 3- Activate the gripper
     //! [qs-activate]
-    Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
+    Robotiq::activate(gripper);
     //! [qs-activate]
 
     // 4- Create a command to move the gripper
@@ -41,10 +41,10 @@ int main() {
 
     //! [qs-wait]
     // 6- Wait for the gripper to echo
-    bool positionRequestEchoed = Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
+    Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
     // 7- Wait for the action to complete
-    bool motionCompleted = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+    Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
     //! [qs-wait]
 
     //! [qs-status]

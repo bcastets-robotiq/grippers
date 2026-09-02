@@ -291,10 +291,10 @@ Wait for the gripper to acknowledge the command, then wait for it to complete:
 <!-- snippet: quick_start.cpp qs-wait -->
 ```cpp
 // 6- Wait for the gripper to echo
-bool positionRequestEchoed = Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
+Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
 // 7- Wait for the action to complete
-bool motionCompleted = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
 ```
 
 Check final status:

@@ -62,7 +62,7 @@ Gripper activation is the first action to perform before being able to use the g
 
 <!-- snippet: quick_start.cpp qs-activate -->
 ```cpp
-Robotiq::ActivationResult activationResult = Robotiq::activate(gripper);
+Robotiq::activate(gripper);
 ```
 
 > **Note :**
@@ -104,10 +104,10 @@ command. Then we can wait for the command to complete.
 <!-- snippet: quick_start.cpp qs-wait -->
 ```cpp
 // 6- Wait for the gripper to echo
-bool positionRequestEchoed = Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
+Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
 // 7- Wait for the action to complete
-bool motionCompleted = Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
 ```
 
 ### Retrieve gripper status
