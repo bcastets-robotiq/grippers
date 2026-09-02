@@ -105,8 +105,7 @@
 //!
 //! Most consumers never need this: GripperCommand, GripperStatus,
 //! GripperStatusFlags, and FaultStatus already expose everything here as
-//! named fields and accessors. Reach for it directly only below that
-//! typed layer, e.g. decoding a raw byte in a no-thread integration.
+//! named fields and accessors.
 
 //! \defgroup connection Connection & Configuration
 //! \ingroup core_api
