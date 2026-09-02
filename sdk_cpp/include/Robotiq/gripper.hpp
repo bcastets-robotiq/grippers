@@ -52,8 +52,9 @@ public:
    explicit Gripper(const ConnectionConfig& config, std::shared_ptr<Logger> logger = nullptr);
 #endif
 
-   //! \brief Create a gripper object and start communication over a
-   //! caller-supplied transport and platform.
+   //! \brief A general-purpose constructor for cases where the common-case
+   //! constructor does not apply. Start communication over a caller-supplied
+   //! transport and platform.
    //!
    //! \param serial The transport to exchange over; must not be null.
    //! \param slaveAddress The gripper's Modbus slave address.
