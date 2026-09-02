@@ -29,7 +29,19 @@ Everything from here on goes inside `int main() { ... }` in quick_start.cpp.
 
 ### Create a connection configuration
 Create a ConnectionConfig object and specify which port the gripper is connected to.
-This example supposes that the gripper is connected to COM4 of a Windows PC. Adjust the code to fit the port you are using to connect the gripper.
+This example hardcodes `COM4`, the port a gripper typically shows up on when
+it's the only USB-serial device plugged into a Windows PC — you must adjust
+this to match your own setup before building.
+
+To find which port your gripper is actually connected to:
+- **Windows**: open Device Manager → **Ports (COM & LPT)**. The gripper
+  shows up as an FTDI USB Serial Port; note its `COMx` number.
+- **Linux**: run `ls /dev/ttyUSB*` — the gripper is typically `/dev/ttyUSB0`
+  (or the newest device that appears after plugging it in).
+- **macOS**: run `ls /dev/tty.usbserial-*`.
+
+Once you know your port, edit the `config.serial.port` line below in
+`quick_start.cpp` to match it, then rebuild.
 
 <!-- snippet: quick_start.cpp qs-config -->
 ```cpp
