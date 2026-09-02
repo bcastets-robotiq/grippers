@@ -22,6 +22,16 @@ git submodule add https://github.com/robotiq/grippers third_party/grippers
 
 This creates a folder named "grippers" inside the "third_party" folder of your project.
 
+Check out the latest release so you build against a stable, tagged
+version rather than the tip of `main`:
+
+```bash
+git -C third_party/grippers checkout v1.0.0
+```
+
+Track `main` instead only if you need an unreleased fix or feature —
+in that case pin to an exact commit rather than floating on the branch.
+
 Then wire it into your own `CMakeLists.txt`:
 
 ```cmake
