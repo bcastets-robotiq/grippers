@@ -308,6 +308,34 @@ uint8_t currentPosition = gripper.getStatus().position;
 std::cout << "Current position : " << static_cast<int>(currentPosition) << std::endl;
 ```
 
+## Without a gripper
+
+`makeFakeGripper()` returns a `Gripper` driving a fake device instead of
+a serial port, for bring-up, demos, and CI on machines with no hardware
+attached:
+
+<!-- snippet: snippets.cpp make-fake-gripper -->
+```cpp
+auto gripper = Robotiq::makeFakeGripper(); // no hardware needed
+Robotiq::activate(*gripper);
+```
+
+Everything above the wire is the real thing — the typed blocks, the
+exchange cycle, the process image, `activate()` / `recoverFromFault()`.
+The device below it is deliberately minimal: activation completes
+instantly, and the fingers are wherever they were last commanded to be.
+There is no motion profile, no travel time, no object detection, and no
+fault injection.
+
+That makes it a good fit for exercising your own integration logic
+against the SDK's real API surface — including in CI, with no hardware
+attached — but it can't stand in for a physical gripper when what
+you're validating is motion timing, object detection, or fault
+behavior.
+
+`makeFakeGripper()` is built under the `GRIPPERS_BUILD_FAKE` CMake
+option; see [CMake options](1-Environment%20setup.md#cmake-options).
+
 ## How the C++ driver handles communication with the gripper
 
 The C++ driver has been developed with the objective of maximizing communication frequency.
