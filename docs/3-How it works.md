@@ -19,7 +19,7 @@ The registers used to command the gripper are composed of 3 registers of 16 bits
 
 The positionRequest, speed and force bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
 
-The action request byte (byte 0) is composed of several bits, each with a dedicated function:
+The gripper action request byte is a packed bit field.
 
 | Bits | 7-6 | 5 | 4 | 3 | 2-1 | 0 |
 |---|---|---|---|---|---|---|
@@ -66,7 +66,7 @@ The registers used to retrieve the status of the gripper are composed of 3 regis
 
 The positionRequestEcho, position and current bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
 
-Grippers status and fault status are composed of several bits, each hosted a specific information.
+The gripper status and fault status bytes are packed bit fields.
 
 *GRIPPER STATUS BYTE (0)*
 
