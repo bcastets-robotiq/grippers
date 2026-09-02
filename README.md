@@ -20,8 +20,8 @@ as STM32 microcontrollers.
 
 <!-- /docs-site:exclude -->
 
-## Questions and bug reports
-Got to the following link to send your questiona and report bugs:
+## Feature requests and bug reports
+Submit here:
 [Robotiq/grippers/issues](https://github.com/Robotiq/grippers/issues)
 
 ## Versioning
