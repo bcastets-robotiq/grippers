@@ -30,11 +30,9 @@ EXAMPLE_PATH           = examples
 
 # Document the hosted API surface, including the ConnectionConfig constructor
 # guarded by GRIPPERS_BUILD_DEFAULT_SERIAL in the public header. This is a
-# compile-time preprocessor macro, normally supplied by the CMake option with
-# the same name; it is not a runtime or operating-system environment variable.
-# A value of 1 includes the libserialport-backed default Serial transport and
-# the ConnectionConfig constructor. A value of 0 omits those pieces so users
-# can provide their own Serial implementation instead.
+# CMake compile-time option (see CMakeLists.txt for details), not a runtime
+# or operating-system environment variable; set to 1 here so that guarded
+# API shows up in the generated docs.
 PREDEFINED             = GRIPPERS_HOSTED=1 GRIPPERS_BUILD_DEFAULT_SERIAL=1
 
 
