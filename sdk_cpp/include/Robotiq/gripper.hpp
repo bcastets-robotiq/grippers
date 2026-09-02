@@ -65,9 +65,6 @@ public:
    //! \throw SerialIOException when the port cannot be opened/configured.
    //! \throw DriverException when no gripper answers the initial read, when
    //!        exchangePeriod is invalid, or when platform is null.
-   //!
-   //! For the common case — a real gripper over a real serial port — use
-   //! the other constructor above instead.
    Gripper(std::unique_ptr<Serial> serial,
            uint8_t slaveAddress,
            std::chrono::microseconds exchangePeriod,
