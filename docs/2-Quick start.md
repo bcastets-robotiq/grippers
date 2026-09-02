@@ -77,7 +77,6 @@ To control the gripper you have to write a command with appropriate parameter an
 
 The command is initially built from a default command.
 The GoTo bit of the action register has to be set to 1 so that the gripper moves to the position written in its position register.
-The desired position, speed and force have to be defined.
 
 <!-- snippet: quick_start.cpp qs-create-command -->
 ```cpp
