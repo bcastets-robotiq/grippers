@@ -110,6 +110,12 @@ uint8_t gCU = status.current;
 `Gripper`'s own methods — `setCommand()`, `getStatus()`, `getCommand()`,
 `connectionState()` — are used to set the command or read the status of the gripper.
 
+The local command image doesn't start out empty: it seeds from the
+gripper's own status echoes at construction, before any command is
+sent. Connecting to an already-running gripper therefore never disturbs
+it — `getCommand()` returns that echoed state until your first
+`setCommand()` overwrites it.
+
 > **Warning:** calling `setCommand()` does not necessarily mean the command
 > will effectively be sent to the gripper.
 
@@ -348,6 +354,11 @@ The `Gripper` object owns a background thread that continuously exchanges
 FC 0x17 Modbus (read&write) transactions with the gripper — up to ~250 Hz at
 115200 baud. That thread is the only thing that directly communicates with the
 gripper.
+
+> **Note:** the exchange thread's Modbus protocol layer is
+> [nanoMODBUS](https://github.com/debevv/nanoMODBUS) (vendored under
+> `sdk_cpp/third_party/`, BSD-licensed); on a hosted build, its serial
+> transport is [libserialport](https://sigrok.org/wiki/Libserialport).
 
 ## Logging
 
