@@ -146,10 +146,6 @@ int main(int argc, char* argv[])
    }
    //! [connection-error-checklist]
 
-   // activate() blocks until the gripper reports the activation handshake
-   // complete (or Timeout/AlreadyActive/FaultLatched). It's a free function,
-   // not a Gripper member, because every Gripper member call returns
-   // instantly — this one polls getStatus()/setCommand() in a loop instead.
    logger->log(Robotiq::Logger::Level::Info, "Activating...");
    //! [activation-recovery]
    ActivationResult activation = Robotiq::activate(*gripper);
