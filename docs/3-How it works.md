@@ -113,8 +113,8 @@ uint8_t gCU = status.current;
 > **Warning:** calling `setCommand()` does not necessarily mean the command
 > will effectively be sent to the gripper.
 
-Those functions only read or write a local copy of the gripper's Modbus
-registers, owned by the gripper object. They do not send any Modbus RTU
+These functions only read or write a local copy of the gripper's command and
+status blocks, owned by the gripper object. They do not send any Modbus RTU
 command to the gripper. The Modbus RTU communication is managed in the
 background by the gripper object, which runs a continuous communication
 thread with the gripper.
