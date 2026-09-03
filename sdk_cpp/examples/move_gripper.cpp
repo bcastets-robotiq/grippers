@@ -35,9 +35,6 @@ constexpr unsigned long kMaxBaudrate = 1000000;
 
 //! \brief Whether the fingers have stopped moving.
 //!
-//! gOBJ reads Moving both while the fingers are actually moving and before
-//! any motion has been requested yet, so "not Moving" is the settled state:
-//! either it stopped on an object, or it reached the requested position.
 //! \param gripper The gripper to read status from.
 //! \return true once motion has settled (stopped on an object, or reached
 //!         the requested position); false while still moving.
