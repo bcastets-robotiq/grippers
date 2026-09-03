@@ -119,9 +119,11 @@ command to the gripper. The Modbus RTU communication is managed in the
 background by the gripper object, which runs a continuous communication
 thread with the gripper.
 
-As a consequence, if you write back-to-back `setCommand()` instructions, only the latest one will be taken into account.
+As a consequence, if you write back-to-back `setCommand()` instructions, only
+the latest one will be taken into account.
 
-As an example, the code below sets an autorelease command and, right after that, a move command.
+As an example, the code below sets an autorelease command and, right after
+that, a move command.
 
 <!-- snippet: snippets.cpp autorelease-then-move -->
 ```cpp
@@ -142,9 +144,17 @@ execute the autorelease, which has the effect of opening or closing the gripper
 and deactivating it. As a consequence, it is not possible to move the
 gripper after the autorelease.
 
-Looking at this code, you may think that the second command, asking for the gripper to move to position 100, will probably not be executed, but in fact it will be. The first `setCommand()` writes the autorelease command to the local copy of the Modbus register, and it is immediately followed by another `setCommand()` which rewrites the local copy before it is effectively sent to the gripper. The consequence is that the autorelease command is not sent to the gripper, and the move command is executed instead.
+Looking at this code, you may think that the second command, asking for the
+gripper to move to position 100, will probably not be executed, but in fact it
+will be. The first `setCommand()` writes the autorelease command to the local
+copy of the command block, and it is immediately followed by another
+`setCommand()` which rewrites the local copy before it is effectively sent to
+the gripper. The consequence is that the autorelease command is not sent to the
+gripper, and the move command is executed instead.
 
-To have the autorelease command effectively sent to the gripper, it is necessary to wait for the gripper to acknowledge reception of the command before the next `setCommand()`.
+To have the autorelease command effectively sent to the gripper, it is
+necessary to wait for the gripper to acknowledge reception of the command
+before the next `setCommand()`.
 
 <!-- snippet: snippets.cpp autorelease-then-move-with-wait -->
 ```cpp
