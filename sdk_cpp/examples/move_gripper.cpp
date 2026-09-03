@@ -97,9 +97,6 @@ int main(int argc, char* argv[])
    }
    //! [argument-handling]
 
-   // ConnectionConfig bundles the serial link and Modbus addressing; the
-   // slave address and exchange frequency default to sane values, so only
-   // the port (and optionally the baudrate) need to be filled in here.
    Robotiq::ConnectionConfig config;
    config.serial.port = argv[1];
    if(argc > 2)
