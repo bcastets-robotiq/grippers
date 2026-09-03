@@ -52,7 +52,9 @@ command.force = 255;
 
 ## Status
 
-The registers used to retrieve the status of the gripper are composed of 3 registers of 16 bits. Each register is split into 2 bytes (8 bits), for a total of 6 bytes.
+The registers used to retrieve the status of the gripper are composed of
+3 16-bit registers . Each register is split into 2 bytes, for a total of 6
+bytes.
 
 |Register| Byte | Name | Content |
 |---|---|---|---|
