@@ -45,9 +45,6 @@ bool motionSettled(Gripper& gripper)
 
 //! \brief Send the gripper to a position and block until it gets there.
 //!
-//! Request a position, wait for the gripper to acknowledge the request
-//! (gPR echo), then wait for the motion to settle. False if either wait
-//! timed out — a wait result is never worth dropping.
 //! \param gripper The gripper to command.
 //! \param command The persistent command block; positionRequest and the
 //!        GoTo bit are set on it before sending.
