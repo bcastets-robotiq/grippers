@@ -141,11 +141,14 @@ command.action.set(Robotiq::ActionRequestBit::AutoRelease);
 gripper.setCommand(command);
 
 // Build and set a command to move the gripper to the position 100
-command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::GoTo);
 command.positionRequest = 100;
 gripper.setCommand(command);
 ```
+
+> **Note :**
+> Note that the same command object is use for the second setCommand. This
+> retains the previously set parameters.
 
 If the autorelease command is effectively sent to the gripper, the gripper will
 execute the autorelease, which has the effect of opening or closing the gripper
@@ -176,7 +179,6 @@ Robotiq::waitFor(
    [&] { return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress); }, 10s);
 
 // Build and set a command to move the gripper to the position 100
-command = Robotiq::GripperCommand::defaults();
 command.action.set(Robotiq::ActionRequestBit::GoTo);
 command.positionRequest = 100;
 gripper.setCommand(command);

@@ -262,7 +262,6 @@ void autoreleaseThenMove(Robotiq::Gripper& gripper)
    gripper.setCommand(command);
 
    // Build and set a command to move the gripper to the position 100
-   command = Robotiq::GripperCommand::defaults();
    command.action.set(Robotiq::ActionRequestBit::GoTo);
    command.positionRequest = 100;
    gripper.setCommand(command);
@@ -282,7 +281,6 @@ void autoreleaseThenMoveWithWait(Robotiq::Gripper& gripper)
       [&] { return (gripper.getStatus().faultStatus.gripperFault() == Robotiq::GripperFault::AutomaticReleaseInProgress); }, 10s);
 
    // Build and set a command to move the gripper to the position 100
-   command = Robotiq::GripperCommand::defaults();
    command.action.set(Robotiq::ActionRequestBit::GoTo);
    command.positionRequest = 100;
    gripper.setCommand(command);
