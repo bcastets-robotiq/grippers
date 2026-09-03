@@ -194,10 +194,6 @@ The predicate is a C++ lambda — an anonymous inline function. `[&]` captures
 live state each time it's polled, and it must return a `bool`: `true` once
 the condition is met.
 
-It returns `true` if the condition held before the timeout, `false`
-otherwise — the condition is checked at least once, so an already-true
-condition never reports a timeout.
-
 ### Activating the gripper
 
 Before sending motion commands, the gripper must be activated once.
