@@ -127,11 +127,6 @@ int main(int argc, char* argv[])
    auto logger = std::make_shared<Robotiq::StderrLogger>("example");
    //! [logger-example-name]
 
-   // Constructing Gripper opens the serial port, does one initial read to
-   // confirm a gripper answers, and starts the background exchange thread
-   // that keeps sending the last command and reading status. From here,
-   // setCommand()/getStatus() just touch an in-memory snapshot: they never
-   // block on the bus themselves.
    std::unique_ptr<Gripper> gripper;
    try
    {
