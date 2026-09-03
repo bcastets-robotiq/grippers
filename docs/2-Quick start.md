@@ -56,7 +56,7 @@ Create a gripper object using the previously created connection configuration.
 
 <!-- snippet: quick_start.cpp qs-create-gripper -->
 ```cpp
-Robotiq::Gripper gripper = Robotiq::Gripper(config);
+Robotiq::Gripper gripper(config);
 ```
 
 ### Activate the gripper

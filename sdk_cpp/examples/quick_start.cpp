@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     // 2- Create the gripper object
     //! [qs-create-gripper]
-    Robotiq::Gripper gripper = Robotiq::Gripper(config);
+    Robotiq::Gripper gripper(config);
     //! [qs-create-gripper]
 
     // 3- Activate the gripper
