@@ -77,7 +77,7 @@ The gripper status and fault status bytes are packed bit fields.
 |---|---|---|
 | Field | kFLT | gFLT |
 
-This SDK translates this into a status object with equivalent fields, decoded using a dedicated enum.
+This SDK translates this into a status object with equivalent fields.
 
 <!-- snippet: snippets.cpp status-gripper-status-fields -->
 ```cpp
