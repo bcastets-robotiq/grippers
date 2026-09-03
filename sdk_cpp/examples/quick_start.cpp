@@ -8,11 +8,15 @@
 using namespace std::chrono_literals; // enables the 1s / 200ms / 5s literals below
 //! [qs-includes]
 
-int main() {
+int main(int argc, char* argv[]) {
     // 1- Create the connection config
     //! [qs-config]
+    if(argc < 2) {
+        std::cerr << "Usage: quick_start <port>\n";
+        return 1;
+    }
     Robotiq::ConnectionConfig config;
-    config.serial.port = "COM4"; //or "/dev/ttyUSB0" for linux. Adjust the port name according to your system.
+    config.serial.port = argv[1]; // e.g. "COM4" on Windows, "/dev/ttyUSB0" on Linux, "/dev/tty.usbserial-XXXX" on macOS
     //! [qs-config]
 
     // 2- Create the gripper object

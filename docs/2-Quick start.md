@@ -25,13 +25,11 @@ using namespace std::chrono_literals; // enables the 1s / 200ms / 5s literals be
 
 ## Write the main program
 
-Everything from here on goes inside `int main() { ... }` in quick_start.cpp.
+Everything from here on goes inside `int main(int argc, char* argv[]) { ... }` in quick_start.cpp.
 
 ### Create a connection configuration
 Create a ConnectionConfig object and specify which port the gripper is connected to.
-This example hardcodes `COM4`, the port a gripper typically shows up on when
-it's the only USB-serial device plugged into a Windows PC — you must adjust
-this to match your own setup before building.
+The port is read from the program's first command-line argument.
 
 To find which port your gripper is actually connected to:
 - **Windows**: open Device Manager → **Ports (COM & LPT)**. The gripper
@@ -40,14 +38,18 @@ To find which port your gripper is actually connected to:
   (or the newest device that appears after plugging it in).
 - **macOS**: run `ls /dev/tty.usbserial-*`.
 
-Once you know your port, edit the `config.serial.port` line below in
-`quick_start.cpp` to match it, then rebuild.
-
 <!-- snippet: quick_start.cpp qs-config -->
 ```cpp
+if(argc < 2) {
+    std::cerr << "Usage: quick_start <port>\n";
+    return 1;
+}
 Robotiq::ConnectionConfig config;
-config.serial.port = "COM4"; //or "/dev/ttyUSB0" for linux. Adjust the port name according to your system.
+config.serial.port = argv[1]; // e.g. "COM4" on Windows, "/dev/ttyUSB0" on Linux, "/dev/tty.usbserial-XXXX" on macOS
 ```
+
+Run the built binary with your port, e.g. `./quick_start /dev/ttyUSB0`
+(Linux/macOS) or `quick_start.exe COM4` (Windows).
 
 ### Create a gripper object
 Create a gripper object using the previously created connection configuration.
