@@ -18,8 +18,6 @@ Each register is split into 2 bytes, for a total of 6 bytes:
 |1002| 4 | SPEED (rSP) | 0-255 value |
 |1002| 5 | FORCE (rFR) | 0-255 value |
 
-The positionRequest, speed and force bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
-
 The gripper action request byte is a packed bit field.
 
 | Bits | 7-6 | 5 | 4 | 3 | 2-1 | 0 |
