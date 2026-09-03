@@ -63,8 +63,6 @@ The registers used to retrieve the status of the gripper are composed of 3 regis
 |2002| 4 | POSITION (gPO) | 0-255 value |
 |2002| 5 | CURRENT (gCU) | 0-255 value |
 
-The positionRequestEcho, position and current bytes are unsigned integers coded on 8 bits, with a value in the range 0-255.
-
 The gripper status and fault status bytes are packed bit fields.
 
 *GRIPPER STATUS BYTE (0)*
