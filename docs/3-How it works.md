@@ -341,10 +341,13 @@ option; see [CMake options](1-Environment%20setup.md#cmake-options).
 
 ## How the C++ driver handles communication with the gripper
 
-The C++ driver has been developed with the objective of maximizing communication frequency.
+The C++ driver has been developed with the objective of maximizing
+communication frequency.
 
 The `Gripper` object owns a background thread that continuously exchanges
-FC 0x17 Modbus (read&write) transactions with the gripper — up to ~200 Hz at 115200 baud. That thread is the only thing that directly communicates with the gripper.
+FC 0x17 Modbus (read&write) transactions with the gripper — up to ~250 Hz at
+115200 baud. That thread is the only thing that directly communicates with the
+gripper.
 
 ## Logging
 
