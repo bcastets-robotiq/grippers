@@ -19,11 +19,11 @@
 using namespace std::chrono_literals; // enables the 1s / 200ms / 5s literals below
 
 // The handful of SDK types this example touches directly:
-using Robotiq::ActionRequestBit; // rACT/rGTO/... bit positions in the command's action byte
-using Robotiq::ActivationResult; // outcome of activate() / recoverFromFault()
-using Robotiq::Gripper;          // the connection: owns the link and the background exchange
-using Robotiq::GripperCommand;   // host -> gripper command block (position, speed, force, action bits)
-using Robotiq::ObjectDetection;  // gOBJ: moving / stopped-on-object / at-requested-position
+using Robotiq::ActionRequestBit;
+using Robotiq::ActivationResult;
+using Robotiq::Gripper;
+using Robotiq::GripperCommand;
+using Robotiq::ObjectDetection;
 
 namespace {
 // Any rate a serial link plausibly runs at. Also what catches a negative:
