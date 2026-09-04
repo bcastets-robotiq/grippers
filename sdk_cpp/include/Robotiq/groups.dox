@@ -82,15 +82,6 @@
 //! \brief The blocking activation / fault-recovery procedures built on
 //! top of Command and Status.
 
-//! \defgroup register_map Register Map & Masks
-//! \ingroup core_api
-//! \brief The raw byte and bit layout behind Commands & Status — the
-//! manual's block table, masks, and shifts.
-//!
-//! Most consumers never need this: GripperCommand, GripperStatus,
-//! GripperStatusFlags, and FaultStatus already expose everything here as
-//! named fields and accessors.
-
 //! \defgroup connection Connection & Configuration
 //! \ingroup core_api
 //! \brief How a Gripper is configured, and the state of its connection.

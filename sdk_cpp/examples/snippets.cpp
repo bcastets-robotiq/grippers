@@ -12,7 +12,6 @@
 
 #include <Robotiq/gripper.hpp>
 #include <Robotiq/gripper/fake/gripper_factory.hpp>
-#include <Robotiq/gripper/register_map.hpp>
 #include <Robotiq/gripper/stderr_logger.hpp>
 
 #include <chrono>
@@ -170,16 +169,6 @@ void makeFakeGripperUsage()
    Robotiq::activate(*gripper);
    //! [make-fake-gripper]
 }
-
-//! [decode-raw-status-byte]
-void decodeRawStatusByte(uint8_t rawStatusByte)
-{
-   
-   uint8_t gSTA = (rawStatusByte & Robotiq::register_map::kActivationStateMask)
-                  >> Robotiq::register_map::kActivationStateShift;
-   
-}
-//! [decode-raw-status-byte]
 
 //! [wait-with-platform]
 void waitWithPlatform(Robotiq::Gripper& gripper, uint8_t target)
