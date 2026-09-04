@@ -129,9 +129,7 @@ enum class ActivationResult
 //! rGTO is cleared when the handshake runs.
 //! \param gripper The gripper to activate.
 //! \param timeout How long to wait for the handshake to complete.
-//! \return Activated or AlreadyActive on success; FaultLatched if a major
-//!         fault blocks activation — call recoverFromFault() instead;
-//!         Timeout if completion never arrived in time.
+//! \return ActivationResult
 //!
 //! \par Example
 //! \snippet move_gripper.cpp activation-recovery
