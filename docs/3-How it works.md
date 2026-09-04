@@ -34,21 +34,30 @@ Packed bytes are built using the `set` function and a dedicated enum.
 Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
 
 // Command building blocks
-// ACTION - rACT
+// ACTION - Activate - rACT
 command.action.set(Robotiq::ActionRequestBit::Activate, true);
-// ACTION - rGTO
+// ACTION - Goto - rGTO
 command.action.set(Robotiq::ActionRequestBit::GoTo, true);
-// ACTION - rATR
+// ACTION - Auto Release - rATR
 command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);
-// ACTION - rARD
+// ACTION - Auto Release Open Direction - rARD
 command.action.set(Robotiq::ActionRequestBit::AutoReleaseOpenDirection, true);
-// POSITION REQUEST - rPR
+// POSITION REQUEST - Position Request - rPR
 command.positionRequest = 100;
-// SPEED - rSP
+// SPEED - Speed - rSP
 command.speed = 255;
-// FORCE - rFR
+// FORCE - Force - rFR
 command.force = 255;
 ```
+
+Each of these bits is set with `command.action.set(Robotiq::ActionRequestBit::<name>, value)`; `value` defaults to `true` when omitted:
+
+| Bit | `ActionRequestBit` | `false` | `true` |
+|---|---|---|---|
+| rACT | `Activate` | Deactivate gripper. | Activate gripper (must stay on after activation routine is completed). |
+| rGTO | `GoTo` | Stop. | Go to requested position. |
+| rATR | `AutoRelease` | Normal. | Emergency auto-release. |
+| rARD | `AutoReleaseOpenDirection` | Closing auto-release direction. | Opening auto-release direction. |
 
 ## Status
 
@@ -87,25 +96,76 @@ This SDK translates this into a status object with equivalent fields.
 Robotiq::GripperStatus status = gripper.getStatus();
 
 // Status building blocks
-// GRIPPER STATUS - gOBJ
+// GRIPPER STATUS - Object detection - gOBJ
 Robotiq::ObjectDetection gOBJ = status.gripperStatus.objectDetection();
-// GRIPPER STATUS - gSTA
+// GRIPPER STATUS - Activation State - gSTA
 Robotiq::ActivationState gSTA = status.gripperStatus.activationState();
-// GRIPPER STATUS - gGTO
+// GRIPPER STATUS - Goto Enabled - gGTO
 bool gGTO = status.gripperStatus.goToEnabled();
-// GRIPPER STATUS - gACT
+// GRIPPER STATUS - Activated - gACT
 bool gACT = status.gripperStatus.activated();
-// FAULT STATUS - kFLT
+// FAULT STATUS - Controller Fault - kFLT
 Robotiq::ControllerFault kFLT = status.faultStatus.controllerFault();
-// FAULT STATUS - gFLT
+// FAULT STATUS - Gripper Fault - gFLT
 Robotiq::GripperFault gFLT = status.faultStatus.gripperFault();
-// POS REQUEST ECHO - gPR
+// POS REQUEST ECHO - Position Request Eco - gPR
 uint8_t gPR = status.positionRequestEcho;
-// POSITION - gPO
+// POSITION - Position - gPO
 uint8_t gPO = status.position;
-// CURRENT - gCU
+// CURRENT - Current - gCU
 uint8_t gCU = status.current;
 ```
+
+`gOBJ`, `gSTA` and `gFLT` are not plain numbers: each is decoded into its own enum, listed below with every possible value.
+
+**gOBJ — `Robotiq::ObjectDetection`** (only meaningful while `gGTO` is set)
+
+| Value | Meaning |
+|---|---|
+| `Moving` (`0x00`) | Fingers are in motion towards requested position. No object detected. |
+| `DetectedWhileOpening` (`0x01`) | Fingers have stopped due to a contact while opening before requested position. Object detected. |
+| `DetectedWhileClosing` (`0x02`) | Fingers have stopped due to a contact while closing before requested position. Object detected. |
+| `AtRequestedPosition` (`0x03`) | Fingers are at requested position. No object detected, or object has been lost/dropped. |
+
+**gSTA — `Robotiq::ActivationState`**
+
+| Value | Meaning |
+|---|---|
+| `Reset` (`0x00`) | Gripper is in reset (or automatic release) state. Check `gFLT` if the gripper is activated. |
+| `InProgress` (`0x01`) | Activation in progress. |
+| `Reserved` (`0x02`) | Not used. |
+| `Complete` (`0x03`) | Activation is completed. |
+
+**gFLT — `Robotiq::GripperFault`**
+
+| Value | Meaning |
+|---|---|
+| `None` (`0x00`) | No fault (solid blue status LED). |
+| `ActionDelayed` (`0x05`) | Action delayed: the activation (re-activation) must be completed prior to performing the action. |
+| `ActivationRequired` (`0x07`) | The activation bit (rACT) must be set prior to performing the action. |
+| `OverTemperature` (`0x08`) | Maximum operating temperature exceeded (≥ 85 °C internally); let it cool down (below 80 °C). |
+| `NoCommunication` (`0x09`) | No communication during at least 1 second. |
+| `UnderVoltage` (`0x0A`) | Under minimum operating voltage.¹ |
+| `AutomaticReleaseInProgress` (`0x0B`) | Automatic release in progress.¹ |
+| `InternalFault` (`0x0C`) | Internal fault; contact support@robotiq.com.¹ |
+| `ActivationFault` (`0x0D`) | Activation fault; verify that no interference or other error occurred.¹ |
+| `Overcurrent` (`0x0E`) | Overcurrent triggered.¹ |
+| `AutomaticReleaseComplete` (`0x0F`) | Automatic release completed.¹ |
+
+¹ Major fault (status LED blinking red/blue): call [`recoverFromFault()`](#recovering-from-a-fault) — a reset (rising edge on rACT) is required to clear it.
+
+**kFLT — `Robotiq::ControllerFault`**
+
+The gripper's own instruction manual defers this nibble to "your optional controller manual"; these are the codes reported by the optional Robotiq Universal Controller:
+
+| Value | Meaning |
+|---|---|
+| `None` (`0x00`) | No fault. |
+| `Supply24VNotDetected` (`0x04`) | 24V supply not detected; reconfiguration over USB is still possible. |
+| `NoDeviceDetected` (`0x05`) | No gripper detected on the bus. |
+| `CommunicationNotReady` (`0x09`) | Main communication protocol is booting. |
+| `EmergencyStop` (`0x0C`) | Emergency stop engaged. |
+| `Overcurrent` (`0x0E`) | Controller overcurrent protection tripped. |
 
 ## Gripper-related functions
 
@@ -306,15 +366,18 @@ Wait for the gripper to acknowledge the command, then wait for it to complete:
 // 6- Wait for the gripper to echo
 Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
-// 7- Wait for the action to complete
-Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+// 7- Wait for the gripper to start moving
+Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() == Robotiq::ObjectDetection::Moving);},200ms);
+
+//8- Wait for the gripper to stop
+Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},5s);
 ```
 
 Check final status:
 
 <!-- snippet: quick_start.cpp qs-status -->
 ```cpp
-// 8- retrieve status
+// 9- retrieve status
 uint8_t currentPosition = gripper.getStatus().position;
 
 // Print retrieved status

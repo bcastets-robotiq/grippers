@@ -47,12 +47,15 @@ int main(int argc, char* argv[]) {
     // 6- Wait for the gripper to echo
     Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
-    // 7- Wait for the action to complete
-    Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+    // 7- Wait for the gripper to start moving
+    Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() == Robotiq::ObjectDetection::Moving);},200ms);
+    
+    //8- Wait for the gripper to stop
+    Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},5s);
     //! [qs-wait]
 
     //! [qs-status]
-    // 8- retrieve status
+    // 9- retrieve status
     uint8_t currentPosition = gripper.getStatus().position;
 
     // Print retrieved status

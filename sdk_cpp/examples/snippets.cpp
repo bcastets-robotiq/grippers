@@ -47,19 +47,19 @@ void commandActionBits()
    Robotiq::GripperCommand command = Robotiq::GripperCommand::defaults();
 
    // Command building blocks
-   // ACTION - rACT
+   // ACTION - Activate - rACT
    command.action.set(Robotiq::ActionRequestBit::Activate, true);
-   // ACTION - rGTO
+   // ACTION - Goto - rGTO
    command.action.set(Robotiq::ActionRequestBit::GoTo, true);
-   // ACTION - rATR
+   // ACTION - Auto Release - rATR
    command.action.set(Robotiq::ActionRequestBit::AutoRelease, false);
-   // ACTION - rARD
+   // ACTION - Auto Release Open Direction - rARD
    command.action.set(Robotiq::ActionRequestBit::AutoReleaseOpenDirection, true);
-   // POSITION REQUEST - rPR
+   // POSITION REQUEST - Position Request - rPR
    command.positionRequest = 100;
-   // SPEED - rSP
+   // SPEED - Speed - rSP
    command.speed = 255;
-   // FORCE - rFR
+   // FORCE - Force - rFR
    command.force = 255;
    //! [command-action-bits]
 }
@@ -71,23 +71,23 @@ void statusGripperStatusFields(Robotiq::Gripper& gripper)
    Robotiq::GripperStatus status = gripper.getStatus();
 
    // Status building blocks
-   // GRIPPER STATUS - gOBJ
+   // GRIPPER STATUS - Object detection - gOBJ
    Robotiq::ObjectDetection gOBJ = status.gripperStatus.objectDetection();
-   // GRIPPER STATUS - gSTA
+   // GRIPPER STATUS - Activation State - gSTA
    Robotiq::ActivationState gSTA = status.gripperStatus.activationState();
-   // GRIPPER STATUS - gGTO
+   // GRIPPER STATUS - Goto Enabled - gGTO
    bool gGTO = status.gripperStatus.goToEnabled();
-   // GRIPPER STATUS - gACT
+   // GRIPPER STATUS - Activated - gACT
    bool gACT = status.gripperStatus.activated();
-   // FAULT STATUS - kFLT
+   // FAULT STATUS - Controller Fault - kFLT
    Robotiq::ControllerFault kFLT = status.faultStatus.controllerFault();
-   // FAULT STATUS - gFLT
+   // FAULT STATUS - Gripper Fault - gFLT
    Robotiq::GripperFault gFLT = status.faultStatus.gripperFault();
-   // POS REQUEST ECHO - gPR
+   // POS REQUEST ECHO - Position Request Eco - gPR
    uint8_t gPR = status.positionRequestEcho;
-   // POSITION - gPO
+   // POSITION - Position - gPO
    uint8_t gPO = status.position;
-   // CURRENT - gCU
+   // CURRENT - Current - gCU
    uint8_t gCU = status.current;
    //! [status-gripper-status-fields]
 }

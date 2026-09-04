@@ -9,3 +9,4 @@ doxygen-xml/
 doxygen-html/
 docs-api/
 build_win/
+.draft/

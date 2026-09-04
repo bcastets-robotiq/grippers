@@ -100,16 +100,26 @@ gripper.setCommand(command);
 ### Wait for the action to be completed
 The C++ driver comes with a convenient wait function that can be used to wait for a gripper action to complete before moving to the next step of the program.
 
-First we have to wait for the gripper to acknowledge the reception of the
-command. Then we can wait for the command to complete.
+First we wait for the gripper to acknowledge the reception of the command.
+
+Then, if the requested position is different from where the gripper already
+was, we wait for it to actually start moving before waiting for it to
+settle. This step is skipped when the gripper was already at the requested
+position, since it will never report `Moving` in that case — there's
+nothing to wait for.
+
+Finally, we wait for the command to complete.
 
 <!-- snippet: quick_start.cpp qs-wait -->
 ```cpp
 // 6- Wait for the gripper to echo
 Robotiq::waitFor([&]{return gripper.getStatus().positionRequestEcho == command.positionRequest;},1s);
 
-// 7- Wait for the action to complete
-Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},10s);
+// 7- Wait for the gripper to start moving
+Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() == Robotiq::ObjectDetection::Moving);},200ms);
+
+//8- Wait for the gripper to stop
+Robotiq::waitFor([&]{return (gripper.getStatus().gripperStatus.objectDetection() != Robotiq::ObjectDetection::Moving);},5s);
 ```
 
 ### Retrieve gripper status
@@ -118,7 +128,7 @@ The status of the gripper can be retrieved with the getStatus function. Here is 
 
 <!-- snippet: quick_start.cpp qs-status -->
 ```cpp
-// 8- retrieve status
+// 9- retrieve status
 uint8_t currentPosition = gripper.getStatus().position;
 
 // Print retrieved status
