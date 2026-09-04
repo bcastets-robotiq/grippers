@@ -23,17 +23,11 @@
 //! | 6-15 | RESERVED               | RESERVED             |
 //!
 //! Two of those bytes are themselves packed with several fields — the
-//! GRIPPER STATUS byte and the FAULT STATUS byte — so this namespace
-//! also carries the bit masks and shifts needed to pull a field's raw
-//! value out of its packed byte: `(byte & xMask) >> xShift`.
+//! GRIPPER STATUS byte and the FAULT STATUS byte
 //!
 //! Most consumers never need any of this directly: GripperCommand and
-//! GripperStatus already expose the byte-level fields as named members,
-//! and GripperStatusFlags / FaultStatus already expose the packed
-//! bytes' sub-fields as accessors — activationState(), objectDetection(),
-//! gripperFault(), controllerFault() — pre-masked and pre-shifted. Reach
-//! for these constants only below that layer, e.g. decoding a raw byte
-//! in a no-thread integration.
+//! GripperStatus already expose the same information in a safer, easier-to-use
+//! format.
 namespace Robotiq::register_map {
 
 //! \addtogroup register_map
