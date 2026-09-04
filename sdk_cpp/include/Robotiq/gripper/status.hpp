@@ -83,7 +83,7 @@ public:
                                           >> register_map::kObjectDetectionShift);
    }
 
-   //! \return The raw GRIPPER STATUS byte, unpacked.
+   //! \return The raw GRIPPER STATUS byte.
    [[nodiscard]] uint8_t raw() const { return _bits; }
 
    //! \return true if both flag bytes are identical.
