@@ -142,6 +142,8 @@ void faultSeverityCheck(Robotiq::Gripper& gripper)
 
 
 //! [uart-logger]
+void uartWrite(std::string_view) {} // stands in for a real UART driver
+
 class UartLogger : public Robotiq::Logger
 {
 public:
@@ -153,9 +155,6 @@ public:
       }
       uartWrite(message);
    }
-
-private:
-   static void uartWrite(std::string_view) {} // stands in for a real UART driver
 };
 
 void useCustomLogger()
