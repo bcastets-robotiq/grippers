@@ -12,11 +12,9 @@
 
 #include <Robotiq/gripper.hpp>
 #include <Robotiq/gripper/fake/gripper_factory.hpp>
-#include <Robotiq/gripper/named_bit_array.hpp>
 #include <Robotiq/gripper/register_map.hpp>
 #include <Robotiq/gripper/serial.hpp>
 #include <Robotiq/gripper/stderr_logger.hpp>
-#include <Robotiq/gripper/throttle.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -167,23 +165,6 @@ void useCustomLogger()
 //! [uart-logger]
 
 
-void namedBitArrayUsage()
-{
-   //! [named-bit-array]
-   enum class Flag : uint8_t
-   {
-      A = 0,
-      B = 1
-   };
-   Robotiq::NamedBitArray<Flag> bits;
-   bits.set(Flag::A);
-   bits.set(Flag::B, false);
-   bool a = bits.get(Flag::A); // true
-   //! [named-bit-array]
-}
-
-
-
 void makeFakeGripperUsage()
 {
    //! [make-fake-gripper]
@@ -239,18 +220,6 @@ void waitWithPlatform(Robotiq::Gripper& gripper, uint8_t target)
       std::chrono::seconds(1));
 }
 //! [wait-with-platform]
-
-//! [throttle-usage]
-void throttleUsage(Robotiq::Logger& logger, bool running)
-{
-   Robotiq::Throttle logThrottle(std::chrono::seconds(1));
-   while(running)
-   {
-      logThrottle.executeIfAllowed([&] { logger.log(Robotiq::Logger::Level::Debug, "still running"); });
-      running = false; // never actually loops; this function only needs to compile
-   }
-}
-//! [throttle-usage]
 
 void autoreleaseThenMove(Robotiq::Gripper& gripper)
 {

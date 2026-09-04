@@ -53,7 +53,7 @@
 //!     Platform, Logger) Gripper is built on, for custom transports,
 //!     RTOS targets, and tests.
 //!   - **Utilities** — small, independent helpers used while driving a
-//!     Gripper (bit flags, rate limiting, polling).
+//!     Gripper (polling).
 //!   - **Register Map & Masks** — the raw byte layout beneath Commands &
 //!     Status, for no-thread integrations decoding bytes directly.
 //!
