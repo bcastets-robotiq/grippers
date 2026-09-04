@@ -45,14 +45,6 @@ inline constexpr std::size_t kStatusDocumentedBytes = 6; //!< leading status-blo
 //! \}
 
 //! \name GRIPPER STATUS byte — masks and shifts
-//! Extract a field from byte 0 of the status block as
-//! `(byte & xMask) >> xShift` (the single-bit flags gACT/gGTO have no
-//! shift: the mask alone reads as 0 or 1).
-//!
-//! GripperStatusFlags already does this for you — reach for these
-//! constants directly only when you have a raw status byte and no
-//! GripperStatusFlags wrapping it, e.g. a no-thread integration decoding
-//! bytes straight off the wire:
 //! \snippet snippets.cpp decode-raw-status-byte
 //! \{
 inline constexpr uint8_t kActivationStatusMask = 0x01; //!< gACT
@@ -64,10 +56,6 @@ inline constexpr int kObjectDetectionShift = 6; //!< shift applied to gOBJ after
 //! \}
 
 //! \name gSTA field values
-//! What a masked-and-shifted gSTA decodes to. These mirror ActivationState
-//! — GripperStatusFlags::activationState() returns that enum, built from
-//! these same values — and exist here only for code decoding a raw byte
-//! directly.
 //! \{
 inline constexpr uint8_t kActivationStateReset = 0x00; //!< see ActivationState::Reset
 inline constexpr uint8_t kActivationStateInProgress = 0x01; //!< see ActivationState::InProgress
@@ -76,10 +64,6 @@ inline constexpr uint8_t kActivationStateComplete = 0x03; //!< see ActivationSta
 //! \}
 
 //! \name gOBJ field values
-//! What a masked-and-shifted gOBJ decodes to. These mirror ObjectDetection
-//! — GripperStatusFlags::objectDetection() returns that enum, built from
-//! these same values — and exist here only for code decoding a raw byte
-//! directly.
 //! \{
 inline constexpr uint8_t kObjectMoving = 0x00; //!< see ObjectDetection::Moving
 inline constexpr uint8_t kObjectDetectedOpening = 0x01; //!< see ObjectDetection::DetectedWhileOpening
@@ -88,9 +72,6 @@ inline constexpr uint8_t kObjectAtRequestedPosition = 0x03; //!< see ObjectDetec
 //! \}
 
 //! \name FAULT STATUS byte — masks and shift
-//! Extract a field from byte 2 of the status block as `(byte & xMask) >> xShift`
-//! (same pattern as the GRIPPER STATUS byte masks above; FaultStatus does
-//! this for you unless you're decoding a raw byte directly).
 //! \{
 inline constexpr uint8_t kGripperFaultMask = 0x0F; //!< gFLT (low nibble)
 inline constexpr uint8_t kControllerFaultMask = 0xF0; //!< kFLT (high nibble)

@@ -103,8 +103,7 @@ static_assert(std::is_standard_layout_v<GripperStatusFlags> && std::is_trivially
 //! \brief The gripper status block (gripper -> host), laid out byte for
 //! byte as the instruction manual's block table.
 //!
-//! data() exposes the raw block for the transport and for no-thread
-//! integrations.
+//! data() exposes the raw block for the transport.
 //!
 //! \par Example
 //! \snippet snippets.cpp motion-settled-example

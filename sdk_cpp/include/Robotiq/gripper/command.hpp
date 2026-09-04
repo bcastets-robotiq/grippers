@@ -47,7 +47,7 @@ using ActionRequest = NamedBitArray<ActionRequestBit>;
 //!
 //! Single-byte fields are plain members; the packed action byte (byte 0)
 //! is an ActionRequest of the manual's action bits. data() exposes the
-//! raw block for the transport and for no-thread integrations.
+//! raw block for the transport.
 //!
 //! \par Example
 //! \snippet quick_start.cpp qs-create-command

@@ -41,22 +41,6 @@
 //! not members of the gripper class and directly use gripper object
 //! to perform an action.
 //!
-//! Core API documentation is organized as follows:
-//!
-//!   - **Commands & Status** — the typed blocks Gripper exchanges
-//!     (GripperCommand out, GripperStatus in) and the fault codes they carry.
-//!   - **Activation & Recovery** — the blocking activation and
-//!     fault-recovery procedures built on top of Commands & Status.
-//!   - **Connection & Configuration** — how a Gripper is told what to
-//!     connect to, and what state that connection is in.
-//!   - **Runtime & Extension Points** — the injectable pieces (Serial,
-//!     Platform, Logger) Gripper is built on, for custom transports,
-//!     RTOS targets, and tests.
-//!   - **Utilities** — small, independent helpers used while driving a
-//!     Gripper (polling).
-//!   - **Register Map & Masks** — the raw byte layout beneath Commands &
-//!     Status, for no-thread integrations decoding bytes directly.
-//!
 //! See \ref testing "Testing & CI Utilities" for driving this same API
 //! without a physical gripper attached.
 
