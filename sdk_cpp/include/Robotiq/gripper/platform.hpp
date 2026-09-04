@@ -61,7 +61,7 @@ class Platform
 public:
    virtual ~Platform() = default;
 
-   /! \return A newly constructed lockable object.
+   //! \return A newly constructed lockable object.
    [[nodiscard]] virtual std::unique_ptr<Mutex> makeMutex() = 0;
 
    //! \brief Start a thread running \p fn.

@@ -30,6 +30,7 @@ public:
    {
    }
 
+   //! \param other The exception to copy.
    DriverException(const DriverException& other)
       : _what(other._what)
    {
