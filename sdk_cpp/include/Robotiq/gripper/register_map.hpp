@@ -12,17 +12,15 @@
 //! (2F-85 / 2F-140 / Hand-E class) command and status blocks, as
 //! published in the gripper's instruction manual.
 //!
-//! The blocks are byte-addressed:
-//! \code
-//!   Byte     Robot output (command)     Robot input (status)
-//!   0        ACTION REQUEST             GRIPPER STATUS
-//!   1        RESERVED                   RESERVED
-//!   2        RESERVED                   FAULT STATUS
-//!   3        POSITION REQUEST           POS REQUEST ECHO
-//!   4        SPEED                      POSITION
-//!   5        FORCE                      CURRENT
-//!   6-15     RESERVED                   RESERVED
-//! \endcode
+//! | Byte | Robot output (command) | Robot input (status) |
+//! |------|------------------------|----------------------|
+//! | 0    | ACTION REQUEST         | GRIPPER STATUS       |
+//! | 1    | RESERVED               | RESERVED             |
+//! | 2    | RESERVED               | FAULT STATUS         |
+//! | 3    | POSITION REQUEST       | POS REQUEST ECHO     |
+//! | 4    | SPEED                  | POSITION             |
+//! | 5    | FORCE                  | CURRENT              |
+//! | 6-15 | RESERVED               | RESERVED             |
 //!
 //! Two of those bytes are themselves packed with several fields — the
 //! GRIPPER STATUS byte and the FAULT STATUS byte — so this namespace
