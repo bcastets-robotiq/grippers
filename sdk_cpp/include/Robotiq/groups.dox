@@ -97,22 +97,15 @@
 
 //! \defgroup transport Transport
 //! \ingroup runtime
-//! \brief Byte-level transport to the gripper hardware — the transport
-//! extension point.
 
 //! \defgroup platform Platform
 //! \ingroup runtime
-//! \brief The OS services (locks, threads, sleeps) Gripper's threaded
-//! runtime needs, as an injectable interface.
 
 //! \defgroup logging Logging
 //! \ingroup runtime
-//! \brief Where diagnostic log lines from Robotiq components go.
 
 //! \defgroup exceptions Exceptions
 //! \ingroup runtime
-//! \brief What a failure in the transport or driver itself looks like
-//! to the caller.
 
 //! \defgroup utilities Utilities
 //! \ingroup core_api
