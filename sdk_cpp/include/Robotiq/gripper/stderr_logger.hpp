@@ -36,7 +36,6 @@ public:
    //!        writes; empty by default (no tag).
    explicit StderrLogger(std::string name = {});
 
-   //! \copydoc Logger::log
    void log(Level level, std::string_view message) override;
 
 private:
