@@ -30,7 +30,6 @@ public:
    {
    }
 
-   //! Copy constructor.
    DriverException(const DriverException& other)
       : _what(other._what)
    {
