@@ -61,13 +61,6 @@ struct GripperCommand
    std::array<uint8_t, register_map::kCommandBlockBytes - register_map::kCommandDocumentedBytes> reservedTail{};
 
    //! \brief A ready-to-use command:
-   //! - Activation request (rACT): True
-   //! - GoTo request (rGTO): False
-   //! - AutoRelease request: False
-   //! - AutoReleaseOpenDirection : False (Closing auto-release)
-   //! - Speed : 255
-   //! - Force : 255
-   //! speed and force the Robotiq URCap defaults to (both maximum).
    //!
    //! \return A GripperCommand with Activate set and speed/force at maximum.
    [[nodiscard]] constexpr static GripperCommand defaults()
