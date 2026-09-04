@@ -33,6 +33,10 @@ enum class ActionRequestBit : uint8_t
 //! \brief The packed action-request byte (byte 0 of the command block), as
 //! a set of ActionRequestBit flags.
 //!
+//! Individual bits are read and written through a generic `set()`/`get()`
+//! pair: `set(bit)` / `set(bit, value)` to write, `unset(bit)` to clear,
+//! and `get(bit)` to read one back.
+//!
 //! \par Example
 //! \snippet snippets.cpp action-request-bits
 using ActionRequest = NamedBitArray<ActionRequestBit>;

@@ -36,7 +36,7 @@ public:
 
 //! \ingroup platform
 //! \brief The OS services Gripper's threaded runtime needs, as an
-//! injectable interface: one exchange thread, one lock, and a yielding
+//! injectable interface: one exchange thread, one lockable object, and a yielding
 //! sleep.
 //!
 //! Every Gripper runs on one: hosted applications pass
@@ -61,7 +61,7 @@ class Platform
 public:
    virtual ~Platform() = default;
 
-   //! \return A newly constructed lock.
+   /! \return A newly constructed lockable object.
    [[nodiscard]] virtual std::unique_ptr<Mutex> makeMutex() = 0;
 
    //! \brief Start a thread running \p fn.
