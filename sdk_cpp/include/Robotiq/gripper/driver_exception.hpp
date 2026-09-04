@@ -15,8 +15,7 @@ namespace Robotiq {
 //! application — invalid configuration, a missing/unresponsive gripper,
 //! or a null argument the caller must not have passed.
 //!
-//! Distinct from SerialIOException, which signals a wire-level failure
-//! that the driver's own retry loop handles internally.
+//! See SerialIOException for wire-level failures
 class DriverException : public std::exception
 {
    std::string _what;
