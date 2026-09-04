@@ -12,10 +12,6 @@ namespace Robotiq {
 
 //! \ingroup connection
 //! \brief The gripper's factory-set Modbus slave address.
-//!
-//! Named so callers and tests can reference the default without
-//! constructing a ConnectionConfig, which is not a literal type
-//! (SerialConfig holds a std::string).
 inline constexpr uint8_t kDefaultModbusSlaveAddress = 0x09;
 
 //! \ingroup connection
