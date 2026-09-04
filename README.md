@@ -28,12 +28,8 @@ Submit here:
 
 [Semantic versioning](https://semver.org) from 1.0.0 on: patch releases fix
 bugs, minor releases add API, and a breaking change to the documented API takes
-a major release. The documented API is what this README and the public headers
-describe — `Gripper`, the command/status blocks and the register map,
-`ConnectionConfig`, `Serial`, `Platform`, `Logger`, and
-`detail::GripperModbusClient` for the no-thread path. Anything under
-`Robotiq/detail/` that is not described here is internal and may change in any
-release.
+a major release. Anything under `Robotiq/detail/` that is not described here is
+internal and may change in any release.
 
 ## License
 
