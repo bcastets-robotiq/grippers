@@ -13,14 +13,12 @@
 #include <Robotiq/gripper.hpp>
 #include <Robotiq/gripper/fake/gripper_factory.hpp>
 #include <Robotiq/gripper/register_map.hpp>
-#include <Robotiq/gripper/serial.hpp>
 #include <Robotiq/gripper/stderr_logger.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string_view>
-#include <vector>
 
 using namespace std::chrono_literals;
 
@@ -182,34 +180,6 @@ void decodeRawStatusByte(uint8_t rawStatusByte)
    
 }
 //! [decode-raw-status-byte]
-
-//! [loopback-serial]
-class RingBuffer
-{
-public:
-   std::vector<uint8_t> take(size_t) { return {}; }
-   void feed(const std::vector<uint8_t>&) {}
-};
-
-class LoopbackSerial : public Robotiq::Serial
-{
-public:
-   void open() override { _open = true; }
-   bool isOpen() const override { return _open; }
-   void close() override { _open = false; }
-   std::vector<uint8_t> read(size_t size, std::chrono::milliseconds) override
-   {
-      return _rx.take(size); // however the test feeds bytes in
-   }
-   void write(const std::vector<uint8_t>& data) override { _rx.feed(data); }
-   std::chrono::milliseconds getTimeout() const override { return _timeout; }
-
-private:
-   bool _open = false;
-   std::chrono::milliseconds _timeout{500};
-   RingBuffer _rx;
-};
-//! [loopback-serial]
 
 //! [wait-with-platform]
 void waitWithPlatform(Robotiq::Gripper& gripper, uint8_t target)

@@ -29,8 +29,8 @@ namespace Robotiq {
 //! lower-priority tasks — see the caveats in
 //! ports/threadx/threadx_platform.hpp.
 //!
-//! \par Example — a minimal loopback transport for tests
-//! \snippet snippets.cpp loopback-serial
+//! \see makeFakeGripper() for testing without hardware; ports/threadx/ for a
+//! reference MCU transport.
 class Serial
 {
 public:
