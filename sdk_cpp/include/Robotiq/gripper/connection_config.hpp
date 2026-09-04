@@ -25,10 +25,8 @@ inline constexpr uint8_t kDefaultModbusSlaveAddress = 0x09;
 //! \snippet snippets.cpp configure-connection
 struct ConnectionConfig
 {
-   //! The serial port and its link parameters; see SerialConfig.
    SerialConfig serial;
 
-   //! The gripper's Modbus slave address; defaults to the factory setting.
    uint8_t modbusSlaveAddress = kDefaultModbusSlaveAddress;
 
    //! \brief Frequency of the background exchange cycle (Gripper), in hertz.
