@@ -4,7 +4,8 @@
 📖 Full documentation: https://robotiq.github.io/docs/drivers/2F%20hande/SDK/C++/
 <!-- /docs-site:exclude -->
 
-A C++ SDK for controlling Robotiq 2F adaptive grippers (2F-85 / 2F-140 / Hand-E class) over their Modbus RTU serial link.
+A C++ SDK for controlling Robotiq adaptive grippers (2F-85 / 2F-140 / Hand-E)
+over their Modbus RTU serial link.
 Cross-platform: Linux, Windows, macOS — and freestanding/RTOS targets such
 as STM32 microcontrollers.
 
