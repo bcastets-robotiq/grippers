@@ -48,13 +48,6 @@
 //! \ingroup core_api
 //! \brief The typed blocks a Gripper exchanges with the hardware: the
 //! command you write to it, and the status you read back from it.
-//!
-//! Mirrors the manual's own block layout:
-//!   - **Command** — what you write: GripperCommand, a 6-byte block
-//!     whose action byte (byte 0) packs individual request bits.
-//!   - **Status** — what you read back: GripperStatus, a 6-byte block
-//!     whose **Gripper Status** (byte 0) and **Fault Status** (byte 2)
-//!     bytes each pack individual flags.
 
 //! \defgroup command Command
 //! \ingroup commanding
