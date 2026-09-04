@@ -15,29 +15,29 @@ namespace Robotiq {
 //! The gripper's own fault code (gFLT, low nibble of the FAULT STATUS byte).
 enum class GripperFault : uint8_t
 {
-   None = 0x00, //!< no fault
-   ActionDelayed = 0x05, //!< reactivation must complete before the action
-   ActivationRequired = 0x07, //!< rACT must be set before an action
-   OverTemperature = 0x08, //!< over max operating temperature; let it cool
-   NoCommunication = 0x09, //!< no communication for at least 1 s
-   UnderVoltage = 0x0A, //!< under minimum operating voltage
-   AutomaticReleaseInProgress = 0x0B, //!< rATR emergency release running
-   InternalFault = 0x0C, //!< contact support
-   ActivationFault = 0x0D, //!< check for interference during activation
-   Overcurrent = 0x0E, //!< motor overcurrent protection tripped
-   AutomaticReleaseComplete = 0x0F, //!< rATR emergency release finished
+   None = 0x00, //!< No fault (solid blue LED)
+   ActionDelayed = 0x05, //!< Action delayed, the activation (re-activation) must be completed prior to performing the action.
+   ActivationRequired = 0x07, //!< The activation bit must be set prior to performing the action.
+   OverTemperature = 0x08, //!< Maximum operating temperature exceeded (≥ 85 °C internally), let cool down (below 80 °C).
+   NoCommunication = 0x09, //!< No communication during at least 1 second.
+   UnderVoltage = 0x0A, //!< Under minimum operating voltage.
+   AutomaticReleaseInProgress = 0x0B, //!< Automatic release in progress.
+   InternalFault = 0x0C, //!< Internal fault; contact support@robotiq.com.
+   ActivationFault = 0x0D, //!< Activation fault, verify that no interference or other error occurred.
+   Overcurrent = 0x0E, //!< Overcurrent triggered.
+   AutomaticReleaseComplete = 0x0F, //!< Automatic release completed.
 };
 
 //! \ingroup fault_status
 //! The optional Robotiq controller's fault code (kFLT, high nibble of the FAULT STATUS byte).
 enum class ControllerFault : uint8_t
 {
-   None = 0x00, //!< no fault
-   Supply24VNotDetected = 0x04, //!< reconfiguration over USB still possible
-   NoDeviceDetected = 0x05, //!< no gripper detected on the bus
-   CommunicationNotReady = 0x09, //!< main communication protocol booting
-   EmergencyStop = 0x0C, //!< emergency stop engaged
-   Overcurrent = 0x0E, //!< controller overcurrent protection tripped
+   None = 0x00, //!< No fault detected
+   Supply24VNotDetected = 0x04, //!< 24V not detected (reconfiguration through USB is possible)
+   NoDeviceDetected = 0x05, //!< No device detected
+   CommunicationNotReady = 0x09, //!< The main communication protocol is ready (may be booting)
+   EmergencyStop = 0x0C, //!< Emergency stop triggered
+   Overcurrent = 0x0E, //!< Overcurrent protection triggered (controller)
 };
 
 //! \ingroup fault_status
