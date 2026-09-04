@@ -229,7 +229,7 @@ git add third_party/grippers
 adjust them when you're consuming the SDK differently: as a dependency
 that shouldn't build its own examples/tests, or on a target that
 doesn't have a hosted C++ runtime (see
-[Embedded / bare-metal builds](5-embedded-stm32-builds.md) for that case
+[Embedded / bare-metal builds](05-embedded-builds.md) for that case
 in detail).
 
 | Option | Default | What it controls |
@@ -237,7 +237,7 @@ in detail).
 | `GRIPPERS_BUILD_EXAMPLES` | `ON` when top-level, `OFF` via `add_subdirectory()` | Builds `examples/quick_start` and `examples/move_gripper`. |
 | `GRIPPERS_BUILD_TESTS` | `ON` when top-level, `OFF` via `add_subdirectory()` | Builds and registers the unit tests with CTest. |
 | `GRIPPERS_HOSTED` | `ON` | Whether the target has a hosted C++ runtime (`std::thread`, `iostream`). `ON` compiles the `std::thread`-backed `Platform` (`makeDefaultPlatform()`) and the stderr default logger, and links `Threads::Threads`. |
-| `GRIPPERS_BUILD_FAKE` | follows `GRIPPERS_HOSTED` | Builds [`makeFakeGripper()`](3-How%20it%20works.md#without-a-gripper) and the fake device it drives. ~30 KB; only useful to hosted consumers, since the fake device needs the threaded exchange loop to run. |
+| `GRIPPERS_BUILD_FAKE` | follows `GRIPPERS_HOSTED` | Builds [`makeFakeGripper()`](03-how-it-works.md#without-a-gripper) and the fake device it drives. ~30 KB; only useful to hosted consumers, since the fake device needs the threaded exchange loop to run. |
 | `GRIPPERS_BUILD_DEFAULT_SERIAL` | follows `GRIPPERS_HOSTED` | Builds the libserialport-backed `DefaultSerial` and the `ConnectionConfig`-based constructors that use it. |
 
 "Top-level" means configuring `sdk_cpp` directly

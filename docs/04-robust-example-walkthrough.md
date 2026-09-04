@@ -1,9 +1,9 @@
 # Robust example walkthrough
 
-[Quick start](2-Quick%20start.md) shows the bare minimum to move a
+[Quick start](02-quick-start.md) shows the bare minimum to move a
 gripper and explicitly skips error handling. [`move_gripper.cpp`](../sdk_cpp/examples/move_gripper.cpp)
 is the same connect → activate → command → wait → status flow made
-robust, using the functions from [How it works](3-How%20it%20works.md).
+robust, using the functions from [How it works](03-how-it-works.md).
 This page doesn't re-walk that flow — it covers what's different about
 the robust version and why.
 
@@ -49,7 +49,7 @@ from the actual mistake.
 ## Reporting a failed connection
 
 Constructing `Gripper` can throw (`SerialIOException` or
-`DriverException` — see [Error handling](3-How%20it%20works.md#error-handling)).
+`DriverException` — see [Error handling](03-how-it-works.md#error-handling)).
 The example catches it once, right at construction, and turns it into a
 checklist instead of a raw exception message:
 
@@ -69,7 +69,7 @@ catch(const std::exception& ex)
 That checklist covers the three things that actually cause this
 exception in practice: nothing plugged in, the wrong port name for the
 platform, and (Linux only) not being in the `dialout` group — see
-[Serial port notes](1-Environment%20setup.md#serial-port-notes).
+[Serial port notes](01-environment-setup.md#serial-port-notes).
 
 ## Naming the loggers
 

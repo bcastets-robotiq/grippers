@@ -5,11 +5,11 @@ use: a `Gripper` owns the bus; control code calls instant
 setters and getters.
 
 - `quick_start` — the minimal connect/activate/move sequence from the
-  [Quick start](../../docs/2-Quick%20start.md) guide, with no error
+  [Quick start](../../docs/02-quick-start.md) guide, with no error
   handling. Read alongside that guide.
 - `move_gripper` — activate, close, and open a gripper through
   `Gripper`'s typed accessors, with error handling and logging. See the
-  [walkthrough](../../docs/4-Robust%20example%20walkthrough.md).
+  [walkthrough](../../docs/04-robust-example-walkthrough.md).
 - `snippets.cpp` (built as `doc_snippets`) — not a real application: every
   `//! [tag]` region in it backs a `\snippet` reference in a header doc
   comment, or a `<!-- snippet: -->`-marked code fence in a `docs/*.md`
@@ -19,6 +19,6 @@ setters and getters.
   `quick_start`/`move_gripper` themselves.
 
 All three are built by `GRIPPERS_BUILD_EXAMPLES` (see
-[Environment setup](../../docs/1-Environment%20setup.md)); `doc_snippets`
+[Environment setup](../../docs/01-environment-setup.md)); `doc_snippets`
 additionally needs `GRIPPERS_BUILD_FAKE` (default on together with it) for
 its `makeFakeGripper()` example.

@@ -4,7 +4,7 @@ Doxygen's `\snippet` keeps the header doc-comments' code examples in sync
 with real, compiled code — see `EXAMPLE_PATH` in `../Doxyfile` and
 `\snippet <file> <tag>` in the headers under `include/Robotiq/`. That
 mechanism only reaches Doxygen-rendered doc comments, though — it can't help
-a hand-authored guide page like `docs/2-Quick start.md`, which quotes real
+a hand-authored guide page like `docs/02-quick-start.md`, which quotes real
 code in plain markdown fences. Those fences are just as much at risk of
 silently drifting from the source they claim to demonstrate (a renamed
 member, a changed signature, a copy-paste mistake), and a stale example
@@ -90,14 +90,14 @@ On a mismatch, it prints a unified diff per drifted block; on an unmarked
 fence, it names the line instead — either way it exits non-zero:
 
 ```
-MISMATCH docs\2-Quick start.md:45 [quick_start.cpp qs-create-gripper] has drifted from sdk_cpp\examples\quick_start.cpp:
+MISMATCH docs\02-quick-start.md:45 [quick_start.cpp qs-create-gripper] has drifted from sdk_cpp\examples\quick_start.cpp:
 --- sdk_cpp\examples\quick_start.cpp
-+++ docs\2-Quick start.md
++++ docs\02-quick-start.md
 @@ -1 +1 @@
 -Robotiq::Gripper gripper = Robotiq::Gripper(config);
 +Robotiq::Gripper gripper(config);
 
-MISSING SNIPPET docs\4-Robust example walkthrough.md:12: ```cpp fence has no <!-- snippet: --> marker (and isn't marked <!-- snippet: exempt -->)
+MISSING SNIPPET docs\04-robust-example-walkthrough.md:12: ```cpp fence has no <!-- snippet: --> marker (and isn't marked <!-- snippet: exempt -->)
 ```
 
 Fix it by editing whichever side is wrong — the markdown fence or the

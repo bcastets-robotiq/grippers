@@ -410,7 +410,7 @@ you're validating is motion timing, object detection, or fault
 behavior.
 
 `makeFakeGripper()` is built under the `GRIPPERS_BUILD_FAKE` CMake
-option; see [CMake options](1-Environment%20setup.md#cmake-options).
+option; see [CMake options](01-environment-setup.md#cmake-options).
 
 ## How the C++ driver handles communication with the gripper
 
@@ -463,5 +463,5 @@ ROS 2 node, or writes to a UART on an embedded target) lets you route
 these lines — and your own application's — through one sink instead of
 two independently-timed sources that could interleave confusingly, the
 same pattern
-[`move_gripper.cpp` uses](4-Robust%20example%20walkthrough.md#sharing-one-logger)
+[`move_gripper.cpp` uses](04-robust-example-walkthrough.md#sharing-one-logger)
 for its own narration.

@@ -4,7 +4,7 @@ This page explains how the SDK compiles for a microcontroller target
 (STM32-class and similar) that has no operating system underneath it —
 no `std::thread`, no filesystem, often no heap of any real size. If
 you've only used the SDK on Linux/Windows/macOS so far, read
-[Quick start](2-Quick%20start.md) first for the basic `Gripper`
+[Quick start](02-quick-start.md) first for the basic `Gripper`
 connect → activate → command → status flow this page builds on;
 `Platform` and `Serial` are introduced below.
 
@@ -38,7 +38,7 @@ an RTOS running.
 ### 1. You have an RTOS: implement `Platform`
 
 Keep using `Gripper` exactly as described in
-[Quick start](2-Quick%20start.md) — same `activate()`, `setCommand()`,
+[Quick start](02-quick-start.md) — same `activate()`, `setCommand()`,
 `getStatus()` — but construct it with the platform-taking constructor
 instead of a `ConnectionConfig`, passing your own `Platform` and
 `Serial`.
@@ -109,7 +109,7 @@ to read from another task, because there's only ever one task.
 ## The CMake side
 
 Two options (of the five documented in
-[Environment setup](1-Environment%20setup.md#cmake-options))
+[Environment setup](01-environment-setup.md#cmake-options))
 matter here:
 
 ```sh
@@ -134,7 +134,7 @@ cmake -S sdk_cpp -B build-freestanding \
 something to run against), and setting it `ON` explicitly alongside
 `GRIPPERS_HOSTED=OFF` is a hard configure error rather than a silent
 no-op — see
-[Environment setup](1-Environment%20setup.md#cmake-options)
+[Environment setup](01-environment-setup.md#cmake-options)
 for the full table.
 
 For an actual cross-compile, add your toolchain's flags on top. The

@@ -12,11 +12,11 @@ as STM32 microcontrollers.
 
 ## Documentation
 
-- [Environment setup](docs/1-Environment%20setup.md)
-- [Quick start](docs/2-Quick%20start.md)
-- [How it works](docs/3-How%20it%20works.md)
-- [Robust example walkthrough](docs/4-Robust%20example%20walkthrough.md)
-- [Embedded / bare-metal builds](docs/5-embedded-stm32-builds.md).
+- [Environment setup](docs/01-environment-setup.md)
+- [Quick start](docs/02-quick-start.md)
+- [How it works](docs/03-how-it-works.md)
+- [Robust example walkthrough](docs/04-robust-example-walkthrough.md)
+- [Embedded / bare-metal builds](docs/05-embedded-builds.md).
 
 <!-- /docs-site:exclude -->
 
