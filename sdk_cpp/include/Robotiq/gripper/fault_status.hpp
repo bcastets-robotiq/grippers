@@ -141,7 +141,7 @@ public:
                                           >> register_map::kControllerFaultShift);
    }
 
-   //! \return The raw FAULT STATUS byte, unpacked.
+   //! \return The raw FAULT STATUS byte.
    [[nodiscard]] uint8_t raw() const { return _bits; }
 
    //! \return true if both fault bytes are identical.
